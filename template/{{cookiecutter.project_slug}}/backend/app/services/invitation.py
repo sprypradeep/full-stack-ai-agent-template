@@ -286,6 +286,33 @@ class InvitationService:
             role=role,
             invited_by_user_id=requester_id,
         )
+        logger.info(
+            "Invitation created for %s to org %s (role=%s) by user %s",
+            normalized_email,
+            organization_id,
+            role,
+            requester_id,
+        )
+{%- if cookiecutter.enable_email %}
+        try:
+            import asyncio
+            from app.email.service import get_email_service
+            from app.core.config import settings
+            from app.repositories import organization_repo, user_repo as _user_repo
+            org = organization_repo.get_by_id(self.db, organization_id)
+            requester_user = _user_repo.get_by_id(self.db, requester_id)
+            email_svc = get_email_service()
+            base_url = settings.BILLING_SUCCESS_URL.rstrip("/").rsplit("/", 1)[0] if hasattr(settings, "BILLING_SUCCESS_URL") else ""
+            accept_url = f"{base_url}/invitations/{invite.token}/accept" if hasattr(invite, "token") else base_url
+            asyncio.run(email_svc.send_invitation(
+                to=normalized_email,
+                inviter_name=(requester_user.full_name or requester_user.email) if requester_user else "A team member",
+                org_name=org.name if org else "the organization",
+                accept_url=accept_url,
+            ))
+        except Exception:
+            logger.exception("email_invitation_failed")
+{%- endif %}
         return invite
 
     def list_for_org(
@@ -429,6 +456,33 @@ class InvitationService:
             role=role,
             invited_by_user_id=requester_id,
         )
+        logger.info(
+            "Invitation created for %s to org %s (role=%s) by user %s",
+            normalized_email,
+            organization_id,
+            role,
+            requester_id,
+        )
+{%- if cookiecutter.enable_email %}
+        try:
+            from app.email.service import get_email_service
+            from app.core.config import settings
+            from app.repositories import organization_repo as _org_repo
+            from app.repositories import user_repo as _user_repo
+            org = await _org_repo.get_by_id(organization_id)
+            requester_user = await _user_repo.get_by_id(requester_id)
+            email_svc = get_email_service()
+            base_url = settings.BILLING_SUCCESS_URL.rstrip("/").rsplit("/", 1)[0] if hasattr(settings, "BILLING_SUCCESS_URL") else ""
+            accept_url = f"{base_url}/invitations/{invite.token}/accept" if hasattr(invite, "token") else base_url
+            await email_svc.send_invitation(
+                to=normalized_email,
+                inviter_name=(requester_user.full_name or requester_user.email) if requester_user else "A team member",
+                org_name=org.name if org else "the organization",
+                accept_url=accept_url,
+            )
+        except Exception:
+            logger.exception("email_invitation_failed")
+{%- endif %}
         return invite
 
     async def list_for_org(

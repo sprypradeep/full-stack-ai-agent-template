@@ -12,6 +12,7 @@ from .config import (
     BrandColorType,
     CIType,
     DatabaseType,
+    EmailProviderType,
     FrontendType,
     LLMProviderType,
     OAuthProvider,
@@ -275,6 +276,87 @@ def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) ->
     default="pymupdf",
     help="PDF parser (pymupdf=local, liteparse=local AI, llamaparse=cloud, all=runtime selection)",
 )
+@click.option("--telegram", is_flag=True, default=False, help="Enable Telegram notifications")
+@click.option("--slack", is_flag=True, default=False, help="Enable Slack notifications")
+@click.option("--teams", is_flag=True, default=False, help="Enable Teams/organizations feature")
+@click.option(
+    "--billing", is_flag=True, default=False, help="Enable Stripe billing (requires --teams)"
+)
+@click.option(
+    "--credits",
+    is_flag=True,
+    default=False,
+    help="Enable credits system (requires --billing)",
+)
+@click.option(
+    "--usage-dashboard",
+    is_flag=True,
+    default=False,
+    help="Enable usage dashboard (requires --credits)",
+)
+@click.option(
+    "--anomaly-detection",
+    is_flag=True,
+    default=False,
+    help="Enable usage anomaly detection (requires --credits)",
+)
+@click.option(
+    "--slack-alerts",
+    is_flag=True,
+    default=False,
+    help="Enable Slack alerts for anomalies (requires --anomaly-detection)",
+)
+@click.option(
+    "--billing-currency",
+    type=str,
+    default="usd",
+    help="Default billing currency (default: usd)",
+)
+@click.option(
+    "--trial-days",
+    type=int,
+    default=14,
+    help="Free trial length in days (default: 14)",
+)
+@click.option(
+    "--trial-requires-card",
+    is_flag=True,
+    default=False,
+    help="Require a payment card to start a trial",
+)
+@click.option("--email", is_flag=True, default=False, help="Enable transactional email")
+@click.option(
+    "--email-provider",
+    type=click.Choice(["resend", "smtp", "log"]),
+    default="log",
+    help="Email provider (default: log — prints to console)",
+)
+@click.option(
+    "--newsletter",
+    is_flag=True,
+    default=False,
+    help="Enable newsletter signup (requires --email)",
+)
+@click.option(
+    "--marketing-site",
+    is_flag=True,
+    default=False,
+    help="Generate marketing/landing pages",
+)
+@click.option("--changelog", is_flag=True, default=False, help="Generate changelog page")
+@click.option("--testimonials", is_flag=True, default=False, help="Generate testimonials section")
+@click.option(
+    "--comparison-pages",
+    is_flag=True,
+    default=False,
+    help="Generate competitor comparison pages",
+)
+@click.option(
+    "--affiliate", is_flag=True, default=False, help="Generate affiliate program pages"
+)
+@click.option(
+    "--status-badge", is_flag=True, default=False, help="Add status/uptime badge to frontend"
+)
 def create(
     name: str,
     output: Path | None,
@@ -316,6 +398,26 @@ def create(
     brand_color: str,
     timezone: str,
     preset: str | None,
+    telegram: bool,
+    slack: bool,
+    teams: bool,
+    billing: bool,
+    credits: bool,
+    usage_dashboard: bool,
+    anomaly_detection: bool,
+    slack_alerts: bool,
+    billing_currency: str,
+    trial_days: int,
+    trial_requires_card: bool,
+    email: bool,
+    email_provider: str,
+    newsletter: bool,
+    marketing_site: bool,
+    changelog: bool,
+    testimonials: bool,
+    comparison_pages: bool,
+    affiliate: bool,
+    status_badge: bool,
 ) -> None:
     """Create a new FastAPI project with specified options.
 
@@ -427,6 +529,26 @@ def create(
                     reranker_type=RerankerType(reranker),
                     pdf_parser=PdfParserType(pdf_parser),
                 ),
+                use_telegram=telegram,
+                use_slack=slack,
+                enable_teams=teams,
+                enable_billing=billing,
+                enable_credits_system=credits,
+                enable_usage_dashboard=usage_dashboard,
+                enable_usage_anomaly_detection=anomaly_detection,
+                enable_slack_alerts=slack_alerts,
+                billing_default_currency=billing_currency,
+                billing_trial_days_default=trial_days,
+                billing_trial_requires_card=trial_requires_card,
+                enable_email=email,
+                email_provider=EmailProviderType(email_provider),
+                enable_newsletter_signup=newsletter,
+                enable_marketing_site=marketing_site,
+                enable_changelog=changelog,
+                enable_testimonials=testimonials,
+                enable_comparison_pages=comparison_pages,
+                enable_affiliate_program=affiliate,
+                enable_status_badge=status_badge,
             )
 
         console.print(f"[cyan]Creating project:[/] {name}")

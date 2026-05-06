@@ -173,6 +173,14 @@ class VectorStoreType(StrEnum):
     PGVECTOR = "pgvector"
 
 
+class EmailProviderType(StrEnum):
+    """Supported transactional email providers."""
+
+    RESEND = "resend"
+    SMTP = "smtp"
+    LOG = "log"  # Prints to console — useful for development
+
+
 class RAGFeatures(BaseModel):
     """RAG features."""
 
@@ -267,6 +275,42 @@ class ProjectConfig(BaseModel):
 
     # Backend
     backend_port: int = 8000
+
+    # Teams & Billing
+    enable_teams: bool = False
+    enable_billing: bool = False
+    enable_credits_system: bool = False
+    enable_usage_anomaly_detection: bool = False
+    enable_usage_dashboard: bool = False
+    enable_slack_alerts: bool = False
+    billing_default_currency: str = "usd"
+    billing_trial_days_default: int = 14
+    billing_trial_requires_card: bool = False
+    billing_credits_per_usd: int = 1000
+    billing_credits_low_threshold: int = 100
+    billing_credits_free_tier_grant: int = 500
+
+    # Email
+    enable_email: bool = False
+    email_provider: EmailProviderType = EmailProviderType.LOG
+    enable_newsletter_signup: bool = False
+
+    # Admin features (visible in frontend admin panel)
+    enable_admin_features_users: bool = True
+    enable_admin_features_organizations: bool = True
+    enable_admin_features_subscriptions: bool = True
+    enable_admin_features_usage: bool = True
+    enable_admin_features_stripe_events: bool = True
+    enable_admin_features_audit_log: bool = True
+    enable_admin_features_system_health: bool = True
+
+    # Marketing / Frontend pages
+    enable_marketing_site: bool = False
+    enable_changelog: bool = False
+    enable_testimonials: bool = False
+    enable_comparison_pages: bool = False
+    enable_affiliate_program: bool = False
+    enable_status_badge: bool = False
 
     @computed_field
     @property
@@ -384,6 +428,36 @@ class ProjectConfig(BaseModel):
                 raise ValueError(
                     "Logfire Celery instrumentation requires Celery as background task system"
                 )
+
+        # Teams & Billing dependency chain
+        if self.enable_billing and not self.enable_teams:
+            raise ValueError("Billing requires Teams to be enabled (enable_teams=true)")
+        if self.enable_credits_system and not self.enable_billing:
+            raise ValueError("Credits system requires Billing to be enabled (enable_billing=true)")
+        if self.enable_usage_anomaly_detection and not self.enable_credits_system:
+            raise ValueError(
+                "Usage anomaly detection requires Credits system to be enabled (enable_credits_system=true)"
+            )
+        if self.enable_usage_dashboard and not self.enable_credits_system:
+            raise ValueError(
+                "Usage dashboard requires Credits system to be enabled (enable_credits_system=true)"
+            )
+        if self.enable_slack_alerts and not self.enable_usage_anomaly_detection:
+            raise ValueError(
+                "Slack alerts require Usage anomaly detection to be enabled (enable_usage_anomaly_detection=true)"
+            )
+
+        # Email dependency chain
+        if self.enable_newsletter_signup and not self.enable_email:
+            raise ValueError("Newsletter signup requires Email to be enabled (enable_email=true)")
+
+        # Teams requires SQL database with JWT
+        if self.enable_teams and self.database not in (
+            DatabaseType.POSTGRESQL,
+            DatabaseType.SQLITE,
+            DatabaseType.MONGODB,
+        ):
+            raise ValueError("Teams requires a database")
 
         # RAG-oriented checks
 
@@ -603,4 +677,36 @@ class ProjectConfig(BaseModel):
             # Messaging channels
             "use_telegram": self.use_telegram,
             "use_slack": self.use_slack,
+            # Teams & Billing
+            "enable_teams": self.enable_teams,
+            "enable_billing": self.enable_billing,
+            "enable_credits_system": self.enable_credits_system,
+            "enable_usage_anomaly_detection": self.enable_usage_anomaly_detection,
+            "enable_usage_dashboard": self.enable_usage_dashboard,
+            "enable_slack_alerts": self.enable_slack_alerts,
+            "billing_default_currency": self.billing_default_currency,
+            "billing_trial_days_default": self.billing_trial_days_default,
+            "billing_trial_requires_card": self.billing_trial_requires_card,
+            "billing_credits_per_usd": self.billing_credits_per_usd,
+            "billing_credits_low_threshold": self.billing_credits_low_threshold,
+            "billing_credits_free_tier_grant": self.billing_credits_free_tier_grant,
+            # Email
+            "enable_email": self.enable_email,
+            "email_provider": self.email_provider.value,
+            "enable_newsletter_signup": self.enable_newsletter_signup,
+            # Admin features
+            "enable_admin_features_users": self.enable_admin_features_users,
+            "enable_admin_features_organizations": self.enable_admin_features_organizations,
+            "enable_admin_features_subscriptions": self.enable_admin_features_subscriptions,
+            "enable_admin_features_usage": self.enable_admin_features_usage,
+            "enable_admin_features_stripe_events": self.enable_admin_features_stripe_events,
+            "enable_admin_features_audit_log": self.enable_admin_features_audit_log,
+            "enable_admin_features_system_health": self.enable_admin_features_system_health,
+            # Marketing / Frontend pages
+            "enable_marketing_site": self.enable_marketing_site,
+            "enable_changelog": self.enable_changelog,
+            "enable_testimonials": self.enable_testimonials,
+            "enable_comparison_pages": self.enable_comparison_pages,
+            "enable_affiliate_program": self.enable_affiliate_program,
+            "enable_status_badge": self.enable_status_badge,
         }

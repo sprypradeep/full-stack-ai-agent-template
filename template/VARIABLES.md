@@ -20,6 +20,8 @@ This document describes all variables available in `cookiecutter.json` for the f
 - [Development Tools](#development-tools)
 - [Deployment](#deployment)
 - [Frontend](#frontend)
+- [Email](#email)
+- [Teams & Billing](#teams--billing)
 
 ---
 
@@ -336,6 +338,19 @@ These variables are set automatically by the generator.
 | `brand_color` | string | `"blue"` | Brand color preset (blue, green, red, violet, orange) | Requires frontend |
 | `brand_color_hue` | string | `"250"` | oklch hue value for the brand color | Computed from `brand_color` |
 | `backend_port` | int | `8000` | Port for backend server | - |
+| `enable_marketing_site` | bool | `false` | Include public marketing pages (landing, pricing, testimonials, changelog) in the Next.js frontend | Requires frontend |
+| `enable_changelog` | bool | `false` | Include a public `/changelog` page listing product updates | Requires `enable_marketing_site` |
+| `enable_comparison_pages` | bool | `false` | Include competitor comparison landing pages (`/vs/competitor-name`) | Requires `enable_marketing_site` |
+| `enable_testimonials` | bool | `false` | Include testimonial/social-proof sections on marketing pages | Requires `enable_marketing_site` |
+| `enable_status_badge` | bool | `false` | Include a live status badge on the frontend that links to a status page | Requires frontend |
+| `enable_affiliate_program` | bool | `false` | Include affiliate/referral tracking pages and hooks | Requires frontend |
+| `enable_admin_features_users` | bool | `false` | Include admin user management UI (`/admin/users`) | Requires frontend + JWT |
+| `enable_admin_features_organizations` | bool | `false` | Include admin organization browser UI (`/admin/organizations`) | Requires frontend + `enable_teams` |
+| `enable_admin_features_subscriptions` | bool | `false` | Include admin subscription management UI (`/admin/subscriptions`) | Requires frontend + `enable_billing` |
+| `enable_admin_features_stripe_events` | bool | `false` | Include admin Stripe event log UI (`/admin/stripe-events`) | Requires frontend + `enable_billing` |
+| `enable_admin_features_usage` | bool | `false` | Include admin usage & credits dashboard UI (`/admin/usage`) | Requires frontend + `enable_credits_system` |
+| `enable_admin_features_audit_log` | bool | `false` | Include admin audit log UI (`/admin/audit-log`) | Requires frontend |
+| `enable_admin_features_system_health` | bool | `false` | Include admin system health / status dashboard UI (`/admin/health`) | Requires frontend |
 
 ---
 
@@ -344,7 +359,17 @@ These variables are set automatically by the generator.
 | Variable | Type | Default | Description | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `enable_teams` | bool | `false` | Enable multi-tenant teams: Organizations, OrganizationMembers, Invitations, role-based access (OWNER/ADMIN/MEMBER/VIEWER), Personal Org auto-create on signup | Requires JWT auth + SQL DB |
-| `enable_billing` | bool | `false` | Enable billing fields on Organization (stripe_customer_id, subscription_tier, credits_balance, trial_ends_at) | Requires `enable_teams` |
+| `enable_billing` | bool | `false` | Enable Stripe billing: Plans, Prices, Subscriptions, checkout flow, customer portal, webhook handler | Requires `enable_teams` |
+| `enable_credits_system` | bool | `false` | Enable credit-based usage metering: credit balance per org, usage events, subscription grants, top-up purchases | Requires `enable_billing` |
+| `enable_usage_anomaly_detection` | bool | `false` | Enable hourly usage spike detection (alerts when current-hour credits exceed 3× rolling 24h average) | Requires `enable_credits_system` |
+| `enable_usage_dashboard` | bool | `false` | Enable admin usage dashboard routes (`/admin/usage/*`) | Requires `enable_credits_system` |
+| `enable_slack_alerts` | bool | `false` | Send anomaly-detection alerts to a Slack webhook URL (`SLACK_ANOMALY_WEBHOOK_URL`) | Requires `enable_usage_anomaly_detection` |
+| `billing_default_currency` | string | `"usd"` | Default Stripe currency (ISO 4217 lowercase, e.g. `usd`, `eur`) | Requires `enable_billing` |
+| `billing_trial_days_default` | int | `14` | Default number of trial days for new subscriptions | Requires `enable_billing` |
+| `billing_trial_requires_card` | bool | `false` | Whether a payment method is required to start a trial | Requires `enable_billing` |
+| `billing_credits_per_usd` | int | `100` | Credit units per 1 USD for top-up purchases | Requires `enable_credits_system` |
+| `billing_credits_free_tier_grant` | int | `500` | One-time credit grant on signup (free tier) | Requires `enable_credits_system` |
+| `billing_credits_low_threshold` | int | `50` | Credit balance threshold below which a low-credits email is sent | Requires `enable_credits_system` |
 
 **Notes:**
 
@@ -353,6 +378,16 @@ These variables are set automatically by the generator.
 - Active organization context is passed via `X-Organization-Id` header (falls back to Personal Org if omitted)
 - Roles hierarchy: OWNER > ADMIN > MEMBER > VIEWER. VIEWERs are non-billable read-only collaborators
 - Personal Org is hard-capped at 1 member (the owner) and cannot be deleted
+
+---
+
+## Email
+
+| Variable | Type | Default | Description | Dependencies |
+|----------|------|---------|-------------|--------------|
+| `enable_email` | bool | `false` | Enable transactional email sending (welcome, invitation, password reset, billing notifications) | - |
+| `email_provider` | enum | `"log"` | Email provider. Values: `resend`, `smtp`, `log` (`log` prints emails to console — useful for development) | Requires `enable_email` |
+| `enable_newsletter_signup` | bool | `false` | Enable public `POST /newsletter/signup` endpoint that sends a welcome email to new subscribers | Requires `enable_email` |
 
 ---
 

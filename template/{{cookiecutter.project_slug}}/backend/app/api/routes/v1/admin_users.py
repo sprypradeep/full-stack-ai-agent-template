@@ -55,7 +55,6 @@ async def update_user(
     _: CurrentAppAdmin,
     service: UserSvc,
 ) -> Any:
-    user = await service.get_by_id(user_id)
     return await service.update(user_id, user_in)
 
 

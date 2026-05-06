@@ -139,7 +139,7 @@ def handle_payment_succeeded(db: Session, event: stripe.Event) -> None:
         from app.email.service import get_email_service
         from app.core.config import settings
         email_svc = get_email_service()
-        asyncio.get_event_loop().run_until_complete(email_svc.send_payment_succeeded(
+        asyncio.run(email_svc.send_payment_succeeded(
             to=invoice.customer_email or "",
             name=invoice.customer_name or "there",
             plan_name=invoice.lines.data[0].description if invoice.lines and invoice.lines.data else "subscription",
@@ -160,7 +160,7 @@ def handle_payment_failed(db: Session, event: stripe.Event) -> None:
         from app.email.service import get_email_service
         from app.core.config import settings
         email_svc = get_email_service()
-        asyncio.get_event_loop().run_until_complete(email_svc.send_payment_failed(
+        asyncio.run(email_svc.send_payment_failed(
             to=invoice.customer_email or "",
             name=invoice.customer_name or "there",
             amount=_format_amount(invoice),

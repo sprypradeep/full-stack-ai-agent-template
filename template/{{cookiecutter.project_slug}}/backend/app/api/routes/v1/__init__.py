@@ -53,6 +53,9 @@ from app.api.routes.v1 import knowledge_bases
 {%- if cookiecutter.enable_billing and cookiecutter.enable_teams %}
 from app.api.routes.v1 import billing
 {%- endif %}
+{%- if cookiecutter.enable_newsletter_signup %}
+from app.api.routes.v1 import marketing
+{%- endif %}
 
 v1_router = APIRouter()
 
@@ -169,6 +172,5 @@ v1_router.include_router(knowledge_bases.router, prefix="/kb", tags=["knowledge-
 v1_router.include_router(billing.router, prefix="/billing", tags=["billing"])
 {%- endif %}
 {%- if cookiecutter.enable_newsletter_signup %}
-from app.api.routes.v1 import marketing
 v1_router.include_router(marketing.router, tags=["marketing"])
 {%- endif %}

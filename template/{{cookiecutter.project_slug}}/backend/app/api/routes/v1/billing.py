@@ -337,13 +337,12 @@ async def stripe_webhook(
     await billing_service.handle_webhook_event(payload, stripe_signature)
     return {"received": True}
 {%- else %}
-def stripe_webhook(
+async def stripe_webhook(
     request: Request,
     billing_service: BillingSvc,
     stripe_signature: str = Header(..., alias="stripe-signature"),
 ) -> Any:
-    import asyncio
-    payload = asyncio.get_event_loop().run_until_complete(request.body())
+    payload = await request.body()
     billing_service.handle_webhook_event(payload, stripe_signature)
     return {"received": True}
 {%- endif %}

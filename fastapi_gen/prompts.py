@@ -14,6 +14,7 @@ from .config import (
     BrandColorType,
     CIType,
     DatabaseType,
+    EmailProviderType,
     FrontendType,
     LLMProviderType,
     LogfireFeatures,
@@ -889,6 +890,243 @@ def prompt_ports(has_frontend: bool) -> dict[str, int]:
     return result
 
 
+def prompt_email_config() -> tuple[bool, EmailProviderType, bool]:
+    """Prompt for email configuration.
+
+    Returns:
+        Tuple of (enable_email, email_provider, enable_newsletter_signup).
+    """
+    console.print()
+    console.print("[bold cyan]Email[/]")
+    console.print()
+
+    enable_email = cast(
+        bool,
+        _check_cancelled(
+            questionary.confirm(
+                "Enable transactional emails? (welcome, invitations, billing notifications)",
+                default=False,
+            ).ask()
+        ),
+    )
+
+    if not enable_email:
+        return False, EmailProviderType.LOG, False
+
+    provider = cast(
+        EmailProviderType,
+        _check_cancelled(
+            questionary.select(
+                "Select email provider:",
+                choices=[
+                    questionary.Choice("Resend (recommended — modern API, great DX)", value=EmailProviderType.RESEND),
+                    questionary.Choice("SMTP (any SMTP server — SendGrid, SES, Mailgun…)", value=EmailProviderType.SMTP),
+                    questionary.Choice("Log (prints to console — development only)", value=EmailProviderType.LOG),
+                ],
+                default=EmailProviderType.RESEND,
+            ).ask()
+        ),
+    )
+
+    enable_newsletter = cast(
+        bool,
+        _check_cancelled(
+            questionary.confirm(
+                "Enable newsletter signup endpoint? (POST /newsletter/signup)",
+                default=False,
+            ).ask()
+        ),
+    )
+
+    return True, provider, enable_newsletter
+
+
+def prompt_teams_billing(database: DatabaseType) -> dict[str, Any]:
+    """Prompt for Teams & Billing configuration.
+
+    Args:
+        database: Selected database (billing requires SQL or MongoDB).
+
+    Returns:
+        Dict with all teams/billing related config values.
+    """
+    console.print()
+    console.print("[bold cyan]Teams & Billing[/]")
+    console.print()
+
+    enable_teams = cast(
+        bool,
+        _check_cancelled(
+            questionary.confirm(
+                "Enable multi-tenant teams? (Organizations, Members, Invitations, role-based access)",
+                default=False,
+            ).ask()
+        ),
+    )
+
+    if not enable_teams:
+        return {
+            "enable_teams": False,
+            "enable_billing": False,
+            "enable_credits_system": False,
+            "enable_usage_anomaly_detection": False,
+            "enable_usage_dashboard": False,
+            "enable_slack_alerts": False,
+            "billing_default_currency": "usd",
+            "billing_trial_days_default": 14,
+            "billing_trial_requires_card": False,
+            "billing_credits_per_usd": 1000,
+            "billing_credits_low_threshold": 100,
+            "billing_credits_free_tier_grant": 500,
+        }
+
+    enable_billing = cast(
+        bool,
+        _check_cancelled(
+            questionary.confirm(
+                "Enable Stripe billing? (Plans, Subscriptions, checkout, customer portal, webhooks)",
+                default=False,
+            ).ask()
+        ),
+    )
+
+    enable_credits = False
+    enable_anomaly = False
+    enable_usage_dash = False
+    enable_slack = False
+    currency = "usd"
+    trial_days = 14
+    trial_card = False
+    credits_per_usd = 1000
+    credits_threshold = 100
+    credits_grant = 500
+
+    if enable_billing:
+        currency = cast(
+            str,
+            _check_cancelled(
+                questionary.select(
+                    "Default billing currency:",
+                    choices=[
+                        questionary.Choice("USD ($)", value="usd"),
+                        questionary.Choice("EUR (€)", value="eur"),
+                        questionary.Choice("GBP (£)", value="gbp"),
+                        questionary.Choice("PLN (zł)", value="pln"),
+                    ],
+                ).ask()
+            ),
+        )
+
+        trial_days_str = _check_cancelled(
+            questionary.text(
+                "Trial period (days):",
+                default="14",
+                validate=_validate_positive_integer,
+            ).ask()
+        )
+        trial_days = int(trial_days_str)
+
+        trial_card = cast(
+            bool,
+            _check_cancelled(
+                questionary.confirm(
+                    "Require payment method to start trial?",
+                    default=False,
+                ).ask()
+            ),
+        )
+
+        enable_credits = cast(
+            bool,
+            _check_cancelled(
+                questionary.confirm(
+                    "Enable credit-based usage metering? (balance per org, usage events, top-up purchases)",
+                    default=False,
+                ).ask()
+            ),
+        )
+
+        if enable_credits:
+            enable_anomaly = cast(
+                bool,
+                _check_cancelled(
+                    questionary.confirm(
+                        "Enable usage spike detection? (alerts when hourly usage > 3× rolling average)",
+                        default=False,
+                    ).ask()
+                ),
+            )
+            enable_usage_dash = cast(
+                bool,
+                _check_cancelled(
+                    questionary.confirm(
+                        "Enable admin usage dashboard? (/admin/usage/*)",
+                        default=False,
+                    ).ask()
+                ),
+            )
+
+            if enable_anomaly:
+                enable_slack = cast(
+                    bool,
+                    _check_cancelled(
+                        questionary.confirm(
+                            "Send spike alerts to Slack webhook? (SLACK_ANOMALY_WEBHOOK_URL)",
+                            default=False,
+                        ).ask()
+                    ),
+                )
+
+    return {
+        "enable_teams": True,
+        "enable_billing": enable_billing,
+        "enable_credits_system": enable_credits,
+        "enable_usage_anomaly_detection": enable_anomaly,
+        "enable_usage_dashboard": enable_usage_dash,
+        "enable_slack_alerts": enable_slack,
+        "billing_default_currency": currency,
+        "billing_trial_days_default": trial_days,
+        "billing_trial_requires_card": trial_card,
+        "billing_credits_per_usd": credits_per_usd,
+        "billing_credits_low_threshold": credits_threshold,
+        "billing_credits_free_tier_grant": credits_grant,
+    }
+
+
+def prompt_marketing_features() -> dict[str, bool]:
+    """Prompt for marketing / public-facing frontend pages.
+
+    Returns:
+        Dict of enable_* flags for marketing features.
+    """
+    console.print()
+    console.print("[bold cyan]Marketing & Public Pages[/]")
+    console.print()
+
+    features = _check_cancelled(
+        questionary.checkbox(
+            "Select public marketing pages to include:",
+            choices=[
+                questionary.Choice("Marketing site (landing page, hero, pricing)", value="marketing_site"),
+                questionary.Choice("Changelog page (/changelog)", value="changelog"),
+                questionary.Choice("Testimonials section", value="testimonials"),
+                questionary.Choice("Competitor comparison pages (/vs/…)", value="comparison_pages"),
+                questionary.Choice("Affiliate / referral program pages", value="affiliate_program"),
+                questionary.Choice("Status badge (links to status page)", value="status_badge"),
+            ],
+        ).ask()
+    )
+
+    return {
+        "enable_marketing_site": "marketing_site" in features,
+        "enable_changelog": "changelog" in features,
+        "enable_testimonials": "testimonials" in features,
+        "enable_comparison_pages": "comparison_pages" in features,
+        "enable_affiliate_program": "affiliate_program" in features,
+        "enable_status_badge": "status_badge" in features,
+    }
+
+
 def run_interactive_prompts() -> ProjectConfig:
     """Run all interactive prompts and return configuration."""
     show_header()
@@ -977,6 +1215,12 @@ def run_interactive_prompts() -> ProjectConfig:
     # Messaging channel integrations
     use_telegram, use_slack = prompt_channels()
 
+    # Teams & Billing
+    teams_billing = prompt_teams_billing(database=database)
+
+    # Email
+    enable_email, email_provider, enable_newsletter_signup = prompt_email_config()
+
     # Rate limit configuration (when rate limiting is enabled)
     rate_limit_requests = 100
     rate_limit_period = 60
@@ -988,8 +1232,10 @@ def run_interactive_prompts() -> ProjectConfig:
 
     # Brand color (if frontend enabled)
     brand_color = BrandColorType.BLUE
+    marketing_features: dict[str, bool] = {}
     if frontend != FrontendType.NONE:
         brand_color = prompt_brand_color()
+        marketing_features = prompt_marketing_features()
 
     # Extract ci_type separately for type safety
     ci_type = cast(CIType, dev_tools.pop("ci_type"))
@@ -1025,6 +1271,14 @@ def run_interactive_prompts() -> ProjectConfig:
         brand_color=brand_color,
         backend_port=ports["backend_port"],
         frontend_port=ports.get("frontend_port", 3000),
+        # Teams & Billing
+        **teams_billing,
+        # Email
+        enable_email=enable_email,
+        email_provider=email_provider,
+        enable_newsletter_signup=enable_newsletter_signup,
+        # Marketing
+        **marketing_features,
         **integrations,
         **dev_tools,
     )
@@ -1074,6 +1328,15 @@ def show_summary(config: ProjectConfig) -> None:
         enabled_features.append("Telegram")
     if config.use_slack:
         enabled_features.append("Slack")
+    if config.enable_teams:
+        teams_str = "Teams"
+        if config.enable_billing:
+            teams_str += " + Billing"
+        if config.enable_credits_system:
+            teams_str += " + Credits"
+        enabled_features.append(teams_str)
+    if config.enable_email:
+        enabled_features.append(f"Email ({config.email_provider.value})")
     if config.enable_docker:
         enabled_features.append("Docker")
 

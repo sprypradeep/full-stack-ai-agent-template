@@ -6,9 +6,9 @@ from pathlib import Path
 from typing import Literal
 
 {% if cookiecutter.use_database or cookiecutter.enable_redis or cookiecutter.enable_rag -%}
-from pydantic import computed_field, field_validator{% if cookiecutter.use_jwt or cookiecutter.use_api_key or cookiecutter.enable_cors %}, ValidationInfo{% endif %}
+from pydantic import computed_field, field_validator, model_validator{% if cookiecutter.use_jwt or cookiecutter.use_api_key or cookiecutter.enable_cors %}, ValidationInfo{% endif %}
 {% else -%}
-from pydantic import field_validator{% if cookiecutter.use_jwt or cookiecutter.use_api_key or cookiecutter.enable_cors %}, ValidationInfo{% endif %}
+from pydantic import field_validator, model_validator{% if cookiecutter.use_jwt or cookiecutter.use_api_key or cookiecutter.enable_cors %}, ValidationInfo{% endif %}
 {% endif -%}
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -481,9 +481,20 @@ class Settings(BaseSettings):
     STRIPE_TRIAL_REQUIRES_PAYMENT_METHOD: bool = {{ cookiecutter.billing_trial_requires_card | lower }}
 
     BILLING_DEFAULT_CURRENCY: str = "{{ cookiecutter.billing_default_currency }}"
-    BILLING_SUCCESS_URL: str = f"{'{FRONTEND_URL}'}/billing?status=success&session_id={{CHECKOUT_SESSION_ID}}"
-    BILLING_CANCEL_URL: str = f"{'{FRONTEND_URL}'}/pricing?status=canceled"
-    BILLING_PORTAL_RETURN_URL: str = f"{'{FRONTEND_URL}'}/billing"
+    BILLING_SUCCESS_URL: str = ""
+    BILLING_CANCEL_URL: str = ""
+    BILLING_PORTAL_RETURN_URL: str = ""
+
+    @model_validator(mode="after")
+    def _set_billing_urls(self) -> "Settings":
+        frontend = self.FRONTEND_URL.rstrip("/")
+        if not self.BILLING_SUCCESS_URL:
+            self.BILLING_SUCCESS_URL = frontend + "/billing?status=success&session_id={CHECKOUT_SESSION_ID}"
+        if not self.BILLING_CANCEL_URL:
+            self.BILLING_CANCEL_URL = frontend + "/pricing?status=canceled"
+        if not self.BILLING_PORTAL_RETURN_URL:
+            self.BILLING_PORTAL_RETURN_URL = frontend + "/billing"
+        return self
 
 {%- if cookiecutter.enable_credits_system %}
     CREDITS_PER_USD: int = {{ cookiecutter.billing_credits_per_usd }}

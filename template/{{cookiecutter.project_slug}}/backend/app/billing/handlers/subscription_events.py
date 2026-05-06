@@ -72,7 +72,7 @@ async def handle_deleted(db: AsyncSession, event: stripe.Event) -> None:
         from app.core.config import settings
         import datetime as _dt
         period_end = stripe_sub.current_period_end
-        access_until = _dt.datetime.fromtimestamp(period_end, _dt.UTC).strftime("%B %d, %Y") if period_end else "end of billing period"
+        access_until = _dt.datetime.fromtimestamp(period_end, _dt.timezone.utc).strftime("%B %d, %Y") if period_end else "end of billing period"
         plan_name = stripe_sub.get("plan", {}).get("nickname", "subscription") if hasattr(stripe_sub, "get") else "subscription"
         email_svc = get_email_service()
         await email_svc.send_subscription_canceled(
@@ -97,7 +97,7 @@ async def handle_trial_ending(db: AsyncSession, event: stripe.Event) -> None:
         from app.core.config import settings
         import datetime as _dt
         trial_end_ts = stripe_sub.trial_end or 0
-        now_ts = _dt.datetime.now(_dt.UTC).timestamp()
+        now_ts = _dt.datetime.now(_dt.timezone.utc).timestamp()
         days_left = max(1, int((trial_end_ts - now_ts) / 86400))
         email_svc = get_email_service()
         await email_svc.send_trial_ending(
@@ -171,9 +171,9 @@ def handle_deleted(db: Session, event: stripe.Event) -> None:
         from app.email.service import get_email_service
         from app.core.config import settings
         period_end = stripe_sub.current_period_end
-        access_until = _dt.datetime.fromtimestamp(period_end, _dt.UTC).strftime("%B %d, %Y") if period_end else "end of billing period"
+        access_until = _dt.datetime.fromtimestamp(period_end, _dt.timezone.utc).strftime("%B %d, %Y") if period_end else "end of billing period"
         email_svc = get_email_service()
-        asyncio.get_event_loop().run_until_complete(email_svc.send_subscription_canceled(
+        asyncio.run(email_svc.send_subscription_canceled(
             to=customer.email or "",
             name=customer.name or customer.email or "there",
             plan_name="subscription",
@@ -195,9 +195,9 @@ def handle_trial_ending(db: Session, event: stripe.Event) -> None:
         from app.email.service import get_email_service
         from app.core.config import settings
         trial_end_ts = stripe_sub.trial_end or 0
-        days_left = max(1, int((trial_end_ts - _dt.datetime.now(_dt.UTC).timestamp()) / 86400))
+        days_left = max(1, int((trial_end_ts - _dt.datetime.now(_dt.timezone.utc).timestamp()) / 86400))
         email_svc = get_email_service()
-        asyncio.get_event_loop().run_until_complete(email_svc.send_trial_ending(
+        asyncio.run(email_svc.send_trial_ending(
             to=customer.email or "",
             name=customer.name or customer.email or "there",
             days_left=days_left,
@@ -275,7 +275,7 @@ async def handle_deleted(db: AsyncIOMotorDatabase, event: stripe.Event) -> None:
         from app.core.config import settings
         import datetime as _dt
         period_end = stripe_sub.current_period_end
-        access_until = _dt.datetime.fromtimestamp(period_end, _dt.UTC).strftime("%B %d, %Y") if period_end else "end of billing period"
+        access_until = _dt.datetime.fromtimestamp(period_end, _dt.timezone.utc).strftime("%B %d, %Y") if period_end else "end of billing period"
         email_svc = get_email_service()
         await email_svc.send_subscription_canceled(
             to=customer.email or "",
@@ -299,7 +299,7 @@ async def handle_trial_ending(db: AsyncIOMotorDatabase, event: stripe.Event) -> 
         from app.core.config import settings
         import datetime as _dt
         trial_end_ts = stripe_sub.trial_end or 0
-        days_left = max(1, int((trial_end_ts - _dt.datetime.now(_dt.UTC).timestamp()) / 86400))
+        days_left = max(1, int((trial_end_ts - _dt.datetime.now(_dt.timezone.utc).timestamp()) / 86400))
         email_svc = get_email_service()
         await email_svc.send_trial_ending(
             to=customer.email or "",

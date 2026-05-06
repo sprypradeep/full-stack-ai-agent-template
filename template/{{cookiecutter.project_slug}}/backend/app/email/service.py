@@ -170,6 +170,12 @@ class EmailService:
         )
 
 {%- endif %}
+    async def send_newsletter_welcome(self, *, to: str, name: str, unsubscribe_url: str = "") -> SendResult:
+        return await self.send(
+            key=EmailKey.NEWSLETTER_WELCOME,
+            to=to,
+            context={"name": name, "unsubscribe_url": unsubscribe_url, "app_name": "{{ cookiecutter.project_name }}"},
+        )
 
 
 def get_email_service() -> EmailService:
