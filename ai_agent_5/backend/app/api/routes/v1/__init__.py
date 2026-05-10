@@ -18,7 +18,6 @@ from app.api.routes.v1.invitations import (
 )
 from app.api.routes.v1 import knowledge_bases
 from app.api.routes.v1 import billing
-from app.api.routes.v1 import api_keys
 from app.api.routes.v1 import me_slash_commands
 from app.api.routes.v1 import admin_stats
 
@@ -77,7 +76,6 @@ v1_router.include_router(knowledge_bases.router, prefix="/kb", tags=["knowledge-
 
 # Billing routes (Stripe Checkout, Portal, Webhook)
 v1_router.include_router(billing.router, prefix="/billing", tags=["billing"])
-v1_router.include_router(api_keys.router, prefix="/api-keys", tags=["api-keys"])
 v1_router.include_router(
     me_slash_commands.router, prefix="/me/slash-commands", tags=["me:slash-commands"]
 )

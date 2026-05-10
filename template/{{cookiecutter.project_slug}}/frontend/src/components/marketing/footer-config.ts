@@ -20,7 +20,9 @@ export function buildMarketingNavLinks(t: T) {
     { label: t("nav.features"), href: `${ROUTES.HOME}#features` },
     { label: t("nav.howItWorks"), href: `${ROUTES.HOME}#how` },
     { label: t("nav.pricing"), href: ROUTES.PRICING },
+{%- if cookiecutter.enable_marketing_site %}
     { label: t("nav.blog"), href: "/blog" },
+{%- endif %}
     { label: t("nav.faq"), href: `${ROUTES.HOME}#faq` },
   ];
 }
@@ -35,6 +37,7 @@ export function buildFooterColumns(t: T): FooterColumn[] {
         { label: t("nav.changelog"), href: "/changelog" },
       ],
     },
+{%- if cookiecutter.enable_marketing_site %}
     {
       title: t("footer.company"),
       links: [
@@ -52,14 +55,24 @@ export function buildFooterColumns(t: T): FooterColumn[] {
         { label: t("nav.community"), href: "/community" },
       ],
     },
+{%- else %}
+    {
+      title: t("footer.resources"),
+      links: [
+        { label: t("footer.apiDocs"), href: `${BACKEND_URL}/docs` },
+      ],
+    },
+{%- endif %}
   ];
 }
 
 export function buildFooterLegal(t: T) {
   return [
+{%- if cookiecutter.enable_marketing_site %}
     { label: t("footer.terms"), href: "/legal/terms" },
     { label: t("footer.privacy"), href: "/legal/privacy" },
     { label: t("footer.cookies"), href: "/legal/cookies" },
+{%- endif %}
   ];
 }
 

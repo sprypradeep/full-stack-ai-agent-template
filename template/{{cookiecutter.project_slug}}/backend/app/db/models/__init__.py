@@ -56,10 +56,6 @@ from app.db.models.audit_log import AppAdminAuditLog
 from app.db.models.knowledge_base import KnowledgeBase
 {%- endif %}
 {%- if cookiecutter.use_auth %}
-{%- set _ = models.append("ApiKey") %}
-from app.db.models.api_key import ApiKey
-{%- endif %}
-{%- if cookiecutter.use_auth %}
 {%- set _ = models.append("UserSlashCommand") %}
 from app.db.models.user_slash_command import UserSlashCommand
 {%- endif %}

@@ -8,43 +8,49 @@
 
 @theme {
   /* ============================================================
-     Brand — pick ONE preset by uncommenting its 4 lines below.
-     Each preset is tuned so contrast on dark + light works.
+     Brand — preset chosen at template-generation time via
+     `--brand-color` CLI flag. Each preset is tuned so contrast
+     on dark + light themes works. Users can override at runtime
+     via the in-app picker (/settings/appearance), which writes
+     CSS variables on `<html>`.
      ============================================================ */
-
-  /* Preset: LIME (FlowMarket vibe — playful, editorial, dramatic) [DEFAULT] */
-  --brand-h: 130;
-  --brand-c: 0.22;
-  --brand-l: 90%;
-  --color-brand-foreground: oklch(15% 0 0);
-
-  /* Preset: ELECTRIC BLUE (Stripe / Vercel — professional, classic SaaS)
-  --brand-h: 252;
+{%- if cookiecutter.brand_color == "blue" %}
+  /* Preset: BLUE (Stripe / Vercel — classic SaaS) */
+  --brand-h: 250;
   --brand-c: 0.20;
   --brand-l: 65%;
   --color-brand-foreground: oklch(98% 0 0);
-  */
-
-  /* Preset: VIOLET (Linear / Anthropic — modern AI, prosumer)
-  --brand-h: 290;
+{%- elif cookiecutter.brand_color == "green" %}
+  /* Preset: GREEN (calm, fresh, healthtech) */
+  --brand-h: 155;
+  --brand-c: 0.18;
+  --brand-l: 65%;
+  --color-brand-foreground: oklch(98% 0 0);
+{%- elif cookiecutter.brand_color == "red" %}
+  /* Preset: RED (warm, energetic) */
+  --brand-h: 25;
+  --brand-c: 0.20;
+  --brand-l: 60%;
+  --color-brand-foreground: oklch(98% 0 0);
+{%- elif cookiecutter.brand_color == "violet" %}
+  /* Preset: VIOLET (Linear / Anthropic — modern AI) */
+  --brand-h: 295;
   --brand-c: 0.22;
   --brand-l: 65%;
   --color-brand-foreground: oklch(98% 0 0);
-  */
-
-  /* Preset: CORAL (warm, friendly, B2C-ish)
-  --brand-h: 25;
+{%- elif cookiecutter.brand_color == "orange" %}
+  /* Preset: ORANGE (warm, friendly, B2C) */
+  --brand-h: 55;
   --brand-c: 0.18;
-  --brand-l: 70%;
-  --color-brand-foreground: oklch(98% 0 0);
-  */
-
-  /* Preset: MINT (calm, fresh, healthtech)
-  --brand-h: 165;
-  --brand-c: 0.13;
-  --brand-l: 70%;
+  --brand-l: 72%;
   --color-brand-foreground: oklch(15% 0 0);
-  */
+{%- else %}
+  /* Preset: BLUE (default fallback) */
+  --brand-h: 250;
+  --brand-c: 0.20;
+  --brand-l: 65%;
+  --color-brand-foreground: oklch(98% 0 0);
+{%- endif %}
 
   --color-brand: oklch(var(--brand-l) var(--brand-c) var(--brand-h));
   --color-brand-hover: oklch(calc(var(--brand-l) - 8%) var(--brand-c) var(--brand-h));

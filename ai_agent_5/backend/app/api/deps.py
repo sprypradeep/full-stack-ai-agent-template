@@ -515,15 +515,6 @@ def get_ingestion_service(
 
 
 IngestionSvc = Annotated[IngestionService, Depends(get_ingestion_service)]
-from app.services.api_key import ApiKeyService
-
-
-def get_api_key_service(db: DBSession) -> ApiKeyService:
-    """Create ApiKeyService instance."""
-    return ApiKeyService(db)
-
-
-ApiKeySvc = Annotated[ApiKeyService, Depends(get_api_key_service)]
 from app.services.user_slash_command import UserSlashCommandService
 
 

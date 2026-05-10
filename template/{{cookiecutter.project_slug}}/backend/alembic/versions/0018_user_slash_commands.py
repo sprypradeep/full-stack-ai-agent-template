@@ -20,7 +20,7 @@ from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from alembic import op
 
 revision = "0018_user_slash_commands"
-down_revision = "0017_create_api_keys_table"
+down_revision = "0016_user_onboarding_at"
 branch_labels = None
 depends_on = None
 

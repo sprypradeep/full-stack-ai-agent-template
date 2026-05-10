@@ -20,7 +20,6 @@ export function buildMarketingNavLinks(t: T) {
     { label: t("nav.features"), href: `${ROUTES.HOME}#features` },
     { label: t("nav.howItWorks"), href: `${ROUTES.HOME}#how` },
     { label: t("nav.pricing"), href: ROUTES.PRICING },
-    { label: t("nav.blog"), href: "/blog" },
     { label: t("nav.faq"), href: `${ROUTES.HOME}#faq` },
   ];
 }
@@ -36,31 +35,14 @@ export function buildFooterColumns(t: T): FooterColumn[] {
       ],
     },
     {
-      title: t("footer.company"),
-      links: [
-        { label: t("nav.about"), href: "/about" },
-        { label: t("nav.blog"), href: "/blog" },
-        { label: t("nav.contact"), href: "/contact" },
-      ],
-    },
-    {
       title: t("footer.resources"),
-      links: [
-        { label: t("footer.helpCenter"), href: "/help" },
-        { label: t("footer.apiDocs"), href: `${BACKEND_URL}/docs` },
-        { label: t("nav.security"), href: "/security" },
-        { label: t("nav.community"), href: "/community" },
-      ],
+      links: [{ label: t("footer.apiDocs"), href: `${BACKEND_URL}/docs` }],
     },
   ];
 }
 
 export function buildFooterLegal(t: T) {
-  return [
-    { label: t("footer.terms"), href: "/legal/terms" },
-    { label: t("footer.privacy"), href: "/legal/privacy" },
-    { label: t("footer.cookies"), href: "/legal/cookies" },
-  ];
+  return [];
 }
 
 /**

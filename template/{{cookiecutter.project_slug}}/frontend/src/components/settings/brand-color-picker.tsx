@@ -17,53 +17,58 @@ interface Preset {
   fgL: number;
 }
 
+// Presets aligned with the CLI `--brand-color` choices so the in-app picker
+// can return to whatever the project was generated with.
 const PRESETS: Preset[] = [
   {
-    key: "lime",
-    label: "Lime",
-    description: "FlowMarket — playful, editorial",
-    h: 130,
-    c: 0.22,
-    l: 90,
-    fgL: 15,
-  },
-  {
     key: "blue",
-    label: "Electric blue",
+    label: "Blue",
     description: "Stripe / Vercel — classic SaaS",
-    h: 252,
+    h: 250,
     c: 0.2,
     l: 65,
+    fgL: 98,
+  },
+  {
+    key: "green",
+    label: "Green",
+    description: "Calm, fresh, healthtech",
+    h: 155,
+    c: 0.18,
+    l: 65,
+    fgL: 98,
+  },
+  {
+    key: "red",
+    label: "Red",
+    description: "Warm, energetic",
+    h: 25,
+    c: 0.2,
+    l: 60,
     fgL: 98,
   },
   {
     key: "violet",
     label: "Violet",
     description: "Linear / Anthropic — modern AI",
-    h: 290,
+    h: 295,
     c: 0.22,
     l: 65,
     fgL: 98,
   },
   {
-    key: "coral",
-    label: "Coral",
-    description: "Warm, friendly, B2C-ish",
-    h: 25,
+    key: "orange",
+    label: "Orange",
+    description: "Warm, friendly, B2C",
+    h: 55,
     c: 0.18,
-    l: 70,
-    fgL: 98,
-  },
-  {
-    key: "mint",
-    label: "Mint",
-    description: "Calm, fresh, healthtech",
-    h: 165,
-    c: 0.13,
-    l: 70,
+    l: 72,
     fgL: 15,
   },
 ];
+
+// Default preset chosen at template-generation time via `--brand-color`.
+const DEFAULT_PRESET_KEY = "{% endraw %}{{ cookiecutter.brand_color }}{% raw %}";
 
 const STORAGE_KEY = "settings.brand_color_preset";
 
@@ -93,7 +98,9 @@ function applyPreset(p: Preset) {
 }
 
 export function BrandColorPicker() {
-  const [active, setActive] = useState<string>(PRESETS[0]!.key);
+  const defaultPreset =
+    PRESETS.find((p) => p.key === DEFAULT_PRESET_KEY) ?? PRESETS[0]!;
+  const [active, setActive] = useState<string>(defaultPreset.key);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -110,6 +117,7 @@ export function BrandColorPicker() {
   const handlePick = (preset: Preset) => {
     setActive(preset.key);
     applyPreset(preset);
+    document.documentElement.setAttribute("data-brand", preset.key);
     window.localStorage.setItem(STORAGE_KEY, preset.key);
   };
 

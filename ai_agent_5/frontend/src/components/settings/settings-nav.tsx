@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, KeyRound, Palette, Plug, Shield, Slash, UserCircle } from "lucide-react";
+import { Bell, Palette, Shield, Slash, UserCircle } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -28,12 +28,6 @@ const ITEMS: NavItem[] = [
     description: "Password, two-factor, danger zone",
   },
   {
-    label: "API keys",
-    href: "/settings/api-keys",
-    icon: KeyRound,
-    description: "Create, rotate, revoke",
-  },
-  {
     label: "Slash commands",
     href: "/settings/slash-commands",
     icon: Slash,
@@ -44,12 +38,6 @@ const ITEMS: NavItem[] = [
     href: "/settings/notifications",
     icon: Bell,
     description: "What we email you about",
-  },
-  {
-    label: "Integrations",
-    href: "/settings/integrations",
-    icon: Plug,
-    description: "Stripe, OAuth, webhooks",
   },
   {
     label: "Appearance",
