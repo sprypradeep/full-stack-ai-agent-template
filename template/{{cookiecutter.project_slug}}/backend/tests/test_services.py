@@ -272,24 +272,27 @@ class TestUserServiceSQLite:
         """Create a mock user."""
         return MockUser()
 
-    def test_get_by_id_success(self, user_service: UserService, mock_user: MockUser):
+    @pytest.mark.anyio
+    async def test_get_by_id_success(self, user_service: UserService, mock_user: MockUser):
         """Test getting user by ID successfully."""
         with patch("app.services.user.user_repo") as mock_repo:
             mock_repo.get_by_id = MagicMock(return_value=mock_user)
 
-            result = user_service.get_by_id(mock_user.id)
+            result = await user_service.get_by_id(mock_user.id)
 
             assert result == mock_user
 
-    def test_get_by_id_not_found(self, user_service: UserService):
+    @pytest.mark.anyio
+    async def test_get_by_id_not_found(self, user_service: UserService):
         """Test getting non-existent user raises NotFoundError."""
         with patch("app.services.user.user_repo") as mock_repo:
             mock_repo.get_by_id = MagicMock(return_value=None)
 
             with pytest.raises(NotFoundError):
-                user_service.get_by_id("nonexistent")
+                await user_service.get_by_id("nonexistent")
 
-    def test_authenticate_success(self, user_service: UserService, mock_user: MockUser):
+    @pytest.mark.anyio
+    async def test_authenticate_success(self, user_service: UserService, mock_user: MockUser):
         """Test successful authentication."""
         with (
             patch("app.services.user.user_repo") as mock_repo,
@@ -297,11 +300,12 @@ class TestUserServiceSQLite:
         ):
             mock_repo.get_by_email = MagicMock(return_value=mock_user)
 
-            result = user_service.authenticate("test@example.com", "password123")
+            result = await user_service.authenticate("test@example.com", "password123")
 
             assert result == mock_user
 
-    def test_register_success(self, user_service: UserService, mock_user: MockUser):
+    @pytest.mark.anyio
+    async def test_register_success(self, user_service: UserService, mock_user: MockUser):
         """Test registering a new user."""
         with patch("app.services.user.user_repo") as mock_repo:
             mock_repo.get_by_email = MagicMock(return_value=None)
@@ -312,7 +316,7 @@ class TestUserServiceSQLite:
                 password="password123",
                 full_name="New User",
             )
-            result = user_service.register(user_in)
+            result = await user_service.register(user_in)
 
             assert result == mock_user
 {%- endif %}

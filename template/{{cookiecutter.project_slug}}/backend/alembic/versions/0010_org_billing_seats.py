@@ -17,13 +17,7 @@ import sqlalchemy as sa
 from alembic import op
 
 revision = "0010_org_billing_seats"
-{%- if cookiecutter.enable_rag and cookiecutter.use_jwt %}
 down_revision = "0009_conv_active_kb_ids"
-{%- elif cookiecutter.enable_rag or cookiecutter.use_jwt %}
-down_revision = "0005_add_org_id_to_conversations_and_rag"
-{%- else %}
-down_revision = "0001_initial"
-{%- endif %}
 branch_labels = None
 depends_on = None
 
@@ -57,13 +51,7 @@ Revision ID: 0010_org_billing_seats
 """
 
 revision = "0010_org_billing_seats"
-{%- if cookiecutter.enable_rag and cookiecutter.use_jwt %}
 down_revision = "0009_conv_active_kb_ids"
-{%- elif cookiecutter.enable_rag or cookiecutter.use_jwt %}
-down_revision = "0005_add_org_id_to_conversations_and_rag"
-{%- else %}
-down_revision = "0001_initial"
-{%- endif %}
 branch_labels = None
 depends_on = None
 

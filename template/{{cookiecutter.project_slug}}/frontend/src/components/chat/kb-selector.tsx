@@ -1,3 +1,4 @@
+{%- if cookiecutter.enable_teams and cookiecutter.enable_rag %}
 "use client";
 
 import { useEffect } from "react";
@@ -158,3 +159,4 @@ export function KBSelector() {
     </Popover>
   );
 }
+{%- endif %}

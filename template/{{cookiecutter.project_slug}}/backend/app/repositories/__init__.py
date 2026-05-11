@@ -24,7 +24,7 @@ from app.repositories import rag_document as rag_document_repo
 from app.repositories import sync_log as sync_log_repo
 from app.repositories import sync_source as sync_source_repo
 {%- endif %}
-{%- if cookiecutter.use_jwt %}
+{%- if (cookiecutter.use_postgresql or cookiecutter.use_sqlite) and cookiecutter.use_jwt %}
 
 from app.repositories import chat_file as chat_file_repo
 from app.repositories import conversation_share as conversation_share_repo
@@ -73,7 +73,7 @@ __all__ = [
     "sync_log_repo",
     "sync_source_repo",
 {%- endif %}
-{%- if cookiecutter.use_jwt %}
+{%- if (cookiecutter.use_postgresql or cookiecutter.use_sqlite) and cookiecutter.use_jwt %}
     "chat_file_repo",
     "conversation_share_repo",
     "message_rating_repo",
