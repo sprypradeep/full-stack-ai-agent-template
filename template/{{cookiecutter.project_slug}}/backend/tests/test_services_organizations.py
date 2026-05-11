@@ -55,12 +55,14 @@ class TestOrganizationService:
         from app.core.exceptions import AlreadyExistsError
         from app.schemas.organization import OrganizationCreate
 
-        with patch("app.services.organization.organization_repo.slug_exists", new=AsyncMock(return_value=True)):
-            with pytest.raises(AlreadyExistsError):
-                await service.create(
-                    OrganizationCreate(name="Taken", slug="taken-slug"),
-                    owner_id=uuid.uuid4(),
-                )
+        with (
+            patch("app.services.organization.organization_repo.slug_exists", new=AsyncMock(return_value=True)),
+            pytest.raises(AlreadyExistsError),
+        ):
+            await service.create(
+                OrganizationCreate(name="Taken", slug="taken-slug"),
+                owner_id=uuid.uuid4(),
+            )
 
     @pytest.mark.anyio
     async def test_create_personal_org(self, service, mock_db):
@@ -87,9 +89,11 @@ class TestOrganizationService:
         mock_membership = MagicMock()
         mock_membership.role = "owner"
 
-        with patch.object(service, "get_for_user", new=AsyncMock(return_value=(mock_org, mock_membership))):
-            with pytest.raises(BadRequestError):
-                await service.delete(uuid.uuid4(), uuid.uuid4())
+        with (
+            patch.object(service, "get_for_user", new=AsyncMock(return_value=(mock_org, mock_membership))),
+            pytest.raises(BadRequestError),
+        ):
+            await service.delete(uuid.uuid4(), uuid.uuid4())
 
     @pytest.mark.anyio
     async def test_delete_blocks_non_owner(self, service, mock_db):
@@ -101,9 +105,11 @@ class TestOrganizationService:
         mock_membership = MagicMock()
         mock_membership.role = "admin"
 
-        with patch.object(service, "get_for_user", new=AsyncMock(return_value=(mock_org, mock_membership))):
-            with pytest.raises(AuthorizationError):
-                await service.delete(uuid.uuid4(), uuid.uuid4())
+        with (
+            patch.object(service, "get_for_user", new=AsyncMock(return_value=(mock_org, mock_membership))),
+            pytest.raises(AuthorizationError),
+        ):
+            await service.delete(uuid.uuid4(), uuid.uuid4())
 
     @pytest.mark.anyio
     async def test_delete_succeeds_for_owner(self, service, mock_db):
@@ -129,18 +135,22 @@ class TestOrganizationService:
         mock_membership = MagicMock()
         mock_membership.role = "member"
 
-        with patch.object(service, "get_for_user", new=AsyncMock(return_value=(mock_org, mock_membership))):
-            with pytest.raises(AuthorizationError):
-                await service.update(uuid.uuid4(), OrganizationUpdate(name="New"), requester_id=uuid.uuid4())
+        with (
+            patch.object(service, "get_for_user", new=AsyncMock(return_value=(mock_org, mock_membership))),
+            pytest.raises(AuthorizationError),
+        ):
+            await service.update(uuid.uuid4(), OrganizationUpdate(name="New"), requester_id=uuid.uuid4())
 
     @pytest.mark.anyio
     async def test_get_for_user_raises_if_not_member(self, service, mock_db):
         import uuid
         from app.core.exceptions import NotFoundError
 
-        with patch("app.services.organization.member_repo.get", new=AsyncMock(return_value=None)):
-            with pytest.raises(NotFoundError):
-                await service.get_for_user(uuid.uuid4(), uuid.uuid4())
+        with (
+            patch("app.services.organization.member_repo.get", new=AsyncMock(return_value=None)),
+            pytest.raises(NotFoundError),
+        ):
+            await service.get_for_user(uuid.uuid4(), uuid.uuid4())
 
 
 class TestUserServiceRegistrationWithOrg:
@@ -193,9 +203,11 @@ class TestOrganizationService:
         from app.core.exceptions import AlreadyExistsError
         from app.schemas.organization import OrganizationCreate
 
-        with patch("app.services.organization.organization_repo.slug_exists", return_value=True):
-            with pytest.raises(AlreadyExistsError):
-                service.create(OrganizationCreate(name="Taken", slug="taken-slug"), owner_id="user-1")
+        with (
+            patch("app.services.organization.organization_repo.slug_exists", return_value=True),
+            pytest.raises(AlreadyExistsError),
+        ):
+            service.create(OrganizationCreate(name="Taken", slug="taken-slug"), owner_id="user-1")
 
     def test_delete_blocks_personal_org(self, service):
         from app.core.exceptions import BadRequestError
@@ -205,9 +217,11 @@ class TestOrganizationService:
         mock_membership = MagicMock()
         mock_membership.role = "owner"
 
-        with patch.object(service, "get_for_user", return_value=(mock_org, mock_membership)):
-            with pytest.raises(BadRequestError):
-                service.delete("org-1", "user-1")
+        with (
+            patch.object(service, "get_for_user", return_value=(mock_org, mock_membership)),
+            pytest.raises(BadRequestError),
+        ):
+            service.delete("org-1", "user-1")
 
     def test_delete_blocks_non_owner(self, service):
         from app.core.exceptions import AuthorizationError
@@ -217,9 +231,11 @@ class TestOrganizationService:
         mock_membership = MagicMock()
         mock_membership.role = "admin"
 
-        with patch.object(service, "get_for_user", return_value=(mock_org, mock_membership)):
-            with pytest.raises(AuthorizationError):
-                service.delete("org-1", "user-1")
+        with (
+            patch.object(service, "get_for_user", return_value=(mock_org, mock_membership)),
+            pytest.raises(AuthorizationError),
+        ):
+            service.delete("org-1", "user-1")
 
     def test_update_requires_admin_or_owner(self, service):
         from app.core.exceptions import AuthorizationError
@@ -229,9 +245,11 @@ class TestOrganizationService:
         mock_membership = MagicMock()
         mock_membership.role = "member"
 
-        with patch.object(service, "get_for_user", return_value=(mock_org, mock_membership)):
-            with pytest.raises(AuthorizationError):
-                service.update("org-1", OrganizationUpdate(name="New"), requester_id="user-1")
+        with (
+            patch.object(service, "get_for_user", return_value=(mock_org, mock_membership)),
+            pytest.raises(AuthorizationError),
+        ):
+            service.update("org-1", OrganizationUpdate(name="New"), requester_id="user-1")
 
 
 {%- else %}

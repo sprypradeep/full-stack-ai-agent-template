@@ -32,9 +32,11 @@ class TestMemberService:
         import uuid
         from app.core.exceptions import NotFoundError
 
-        with patch("app.services.member.member_repo.get", new=AsyncMock(return_value=None)):
-            with pytest.raises(NotFoundError):
-                await service.list_for_org(uuid.uuid4(), uuid.uuid4())
+        with (
+            patch("app.services.member.member_repo.get", new=AsyncMock(return_value=None)),
+            pytest.raises(NotFoundError),
+        ):
+            await service.list_for_org(uuid.uuid4(), uuid.uuid4())
 
     @pytest.mark.anyio
     async def test_change_role_raises_if_requester_not_admin_or_owner(self, service):
@@ -44,9 +46,11 @@ class TestMemberService:
         mock_member = MagicMock()
         mock_member.role = "member"
 
-        with patch("app.services.member.member_repo.get", new=AsyncMock(return_value=mock_member)):
-            with pytest.raises(AuthorizationError):
-                await service.change_role(uuid.uuid4(), uuid.uuid4(), "viewer", requester_id=uuid.uuid4())
+        with (
+            patch("app.services.member.member_repo.get", new=AsyncMock(return_value=mock_member)),
+            pytest.raises(AuthorizationError),
+        ):
+            await service.change_role(uuid.uuid4(), uuid.uuid4(), "viewer", requester_id=uuid.uuid4())
 
     @pytest.mark.anyio
     async def test_change_role_raises_if_target_is_owner(self, service):
@@ -65,9 +69,11 @@ class TestMemberService:
             call_count += 1
             return mock_requester if call_count == 1 else mock_target
 
-        with patch("app.services.member.member_repo.get", new=mock_get):
-            with pytest.raises(BadRequestError):
-                await service.change_role(uuid.uuid4(), uuid.uuid4(), "admin", requester_id=uuid.uuid4())
+        with (
+            patch("app.services.member.member_repo.get", new=mock_get),
+            pytest.raises(BadRequestError),
+        ):
+            await service.change_role(uuid.uuid4(), uuid.uuid4(), "admin", requester_id=uuid.uuid4())
 
     @pytest.mark.anyio
     async def test_change_role_admin_cannot_assign_admin_role(self, service):
@@ -86,9 +92,11 @@ class TestMemberService:
             call_count += 1
             return mock_requester if call_count == 1 else mock_target
 
-        with patch("app.services.member.member_repo.get", new=mock_get):
-            with pytest.raises(AuthorizationError):
-                await service.change_role(uuid.uuid4(), uuid.uuid4(), "admin", requester_id=uuid.uuid4())
+        with (
+            patch("app.services.member.member_repo.get", new=mock_get),
+            pytest.raises(AuthorizationError),
+        ):
+            await service.change_role(uuid.uuid4(), uuid.uuid4(), "admin", requester_id=uuid.uuid4())
 
     @pytest.mark.anyio
     async def test_remove_raises_if_not_authorized(self, service):
@@ -98,9 +106,11 @@ class TestMemberService:
         mock_member = MagicMock()
         mock_member.role = "viewer"
 
-        with patch("app.services.member.member_repo.get", new=AsyncMock(return_value=mock_member)):
-            with pytest.raises(AuthorizationError):
-                await service.remove(uuid.uuid4(), uuid.uuid4(), requester_id=uuid.uuid4())
+        with (
+            patch("app.services.member.member_repo.get", new=AsyncMock(return_value=mock_member)),
+            pytest.raises(AuthorizationError),
+        ):
+            await service.remove(uuid.uuid4(), uuid.uuid4(), requester_id=uuid.uuid4())
 
     @pytest.mark.anyio
     async def test_remove_admin_cannot_remove_admin(self, service):
@@ -119,9 +129,11 @@ class TestMemberService:
             call_count += 1
             return mock_requester if call_count == 1 else mock_target
 
-        with patch("app.services.member.member_repo.get", new=mock_get):
-            with pytest.raises(AuthorizationError):
-                await service.remove(uuid.uuid4(), uuid.uuid4(), requester_id=uuid.uuid4())
+        with (
+            patch("app.services.member.member_repo.get", new=mock_get),
+            pytest.raises(AuthorizationError),
+        ):
+            await service.remove(uuid.uuid4(), uuid.uuid4(), requester_id=uuid.uuid4())
 
     @pytest.mark.anyio
     async def test_leave_owner_blocked_if_others_exist(self, service):
@@ -146,9 +158,11 @@ class TestMemberService:
         mock_requester = MagicMock()
         mock_requester.role = "admin"
 
-        with patch("app.services.member.member_repo.get", new=AsyncMock(return_value=mock_requester)):
-            with pytest.raises(AuthorizationError):
-                await service.transfer_ownership(uuid.uuid4(), uuid.uuid4(), requester_id=uuid.uuid4())
+        with (
+            patch("app.services.member.member_repo.get", new=AsyncMock(return_value=mock_requester)),
+            pytest.raises(AuthorizationError),
+        ):
+            await service.transfer_ownership(uuid.uuid4(), uuid.uuid4(), requester_id=uuid.uuid4())
 
     @pytest.mark.anyio
     async def test_transfer_ownership_to_self_raises(self, service):
@@ -159,9 +173,11 @@ class TestMemberService:
         mock_requester = MagicMock()
         mock_requester.role = "owner"
 
-        with patch("app.services.member.member_repo.get", new=AsyncMock(return_value=mock_requester)):
-            with pytest.raises(BadRequestError):
-                await service.transfer_ownership(uuid.uuid4(), uid, requester_id=uid)
+        with (
+            patch("app.services.member.member_repo.get", new=AsyncMock(return_value=mock_requester)),
+            pytest.raises(BadRequestError),
+        ):
+            await service.transfer_ownership(uuid.uuid4(), uid, requester_id=uid)
 
 
 class TestInvitationService:
@@ -189,9 +205,11 @@ class TestInvitationService:
         mock_member = MagicMock()
         mock_member.role = "member"
 
-        with patch("app.services.invitation.member_repo.get", new=AsyncMock(return_value=mock_member)):
-            with pytest.raises(AuthorizationError):
-                await service.invite(uuid.uuid4(), "user@example.com", "member", requester_id=uuid.uuid4())
+        with (
+            patch("app.services.invitation.member_repo.get", new=AsyncMock(return_value=mock_member)),
+            pytest.raises(AuthorizationError),
+        ):
+            await service.invite(uuid.uuid4(), "user@example.com", "member", requester_id=uuid.uuid4())
 
     @pytest.mark.anyio
     async def test_invite_admin_cannot_invite_as_admin(self, service):
@@ -201,9 +219,11 @@ class TestInvitationService:
         mock_requester = MagicMock()
         mock_requester.role = "admin"
 
-        with patch("app.services.invitation.member_repo.get", new=AsyncMock(return_value=mock_requester)):
-            with pytest.raises(AuthorizationError):
-                await service.invite(uuid.uuid4(), "user@example.com", "admin", requester_id=uuid.uuid4())
+        with (
+            patch("app.services.invitation.member_repo.get", new=AsyncMock(return_value=mock_requester)),
+            pytest.raises(AuthorizationError),
+        ):
+            await service.invite(uuid.uuid4(), "user@example.com", "admin", requester_id=uuid.uuid4())
 
     @pytest.mark.anyio
     async def test_invite_raises_on_duplicate_pending(self, service):
@@ -227,9 +247,11 @@ class TestInvitationService:
         import uuid
         from app.core.exceptions import NotFoundError
 
-        with patch("app.services.invitation.invitation_repo.get_by_token", new=AsyncMock(return_value=None)):
-            with pytest.raises(NotFoundError):
-                await service.accept("bad-token", accepting_user_id=uuid.uuid4())
+        with (
+            patch("app.services.invitation.invitation_repo.get_by_token", new=AsyncMock(return_value=None)),
+            pytest.raises(NotFoundError),
+        ):
+            await service.accept("bad-token", accepting_user_id=uuid.uuid4())
 
     @pytest.mark.anyio
     async def test_accept_raises_on_non_pending_invite(self, service):
@@ -239,9 +261,11 @@ class TestInvitationService:
         mock_invite = MagicMock()
         mock_invite.status = "accepted"
 
-        with patch("app.services.invitation.invitation_repo.get_by_token", new=AsyncMock(return_value=mock_invite)):
-            with pytest.raises(BadRequestError):
-                await service.accept("some-token", accepting_user_id=uuid.uuid4())
+        with (
+            patch("app.services.invitation.invitation_repo.get_by_token", new=AsyncMock(return_value=mock_invite)),
+            pytest.raises(BadRequestError),
+        ):
+            await service.accept("some-token", accepting_user_id=uuid.uuid4())
 
     @pytest.mark.anyio
     async def test_revoke_raises_if_not_pending(self, service):
@@ -251,9 +275,11 @@ class TestInvitationService:
         mock_invite = MagicMock()
         mock_invite.status = "expired"
 
-        with patch("app.services.invitation.invitation_repo.get_by_token", new=AsyncMock(return_value=mock_invite)):
-            with pytest.raises(BadRequestError):
-                await service.revoke("some-token", requester_id=uuid.uuid4())
+        with (
+            patch("app.services.invitation.invitation_repo.get_by_token", new=AsyncMock(return_value=mock_invite)),
+            pytest.raises(BadRequestError),
+        ):
+            await service.revoke("some-token", requester_id=uuid.uuid4())
 
 
 {%- elif cookiecutter.use_sqlite %}
@@ -274,9 +300,11 @@ class TestMemberService:
     def test_list_for_org_raises_if_not_member(self, service):
         from app.core.exceptions import NotFoundError
 
-        with patch("app.services.member.member_repo.get", return_value=None):
-            with pytest.raises(NotFoundError):
-                service.list_for_org("org-1", "user-1")
+        with (
+            patch("app.services.member.member_repo.get", return_value=None),
+            pytest.raises(NotFoundError),
+        ):
+            service.list_for_org("org-1", "user-1")
 
     def test_change_role_raises_if_requester_not_admin(self, service):
         from app.core.exceptions import AuthorizationError
@@ -284,9 +312,11 @@ class TestMemberService:
         mock_member = MagicMock()
         mock_member.role = "member"
 
-        with patch("app.services.member.member_repo.get", return_value=mock_member):
-            with pytest.raises(AuthorizationError):
-                service.change_role("org-1", "user-2", "viewer", requester_id="user-1")
+        with (
+            patch("app.services.member.member_repo.get", return_value=mock_member),
+            pytest.raises(AuthorizationError),
+        ):
+            service.change_role("org-1", "user-2", "viewer", requester_id="user-1")
 
     def test_leave_owner_blocked_if_others_exist(self, service):
         from app.core.exceptions import BadRequestError
@@ -307,9 +337,11 @@ class TestMemberService:
         mock_requester = MagicMock()
         mock_requester.role = "admin"
 
-        with patch("app.services.member.member_repo.get", return_value=mock_requester):
-            with pytest.raises(AuthorizationError):
-                service.transfer_ownership("org-1", "user-2", requester_id="user-1")
+        with (
+            patch("app.services.member.member_repo.get", return_value=mock_requester),
+            pytest.raises(AuthorizationError),
+        ):
+            service.transfer_ownership("org-1", "user-2", requester_id="user-1")
 
 
 class TestInvitationService:
@@ -330,16 +362,20 @@ class TestInvitationService:
         mock_member = MagicMock()
         mock_member.role = "viewer"
 
-        with patch("app.services.invitation.member_repo.get", return_value=mock_member):
-            with pytest.raises(AuthorizationError):
-                service.invite("org-1", "user@example.com", "member", requester_id="user-1")
+        with (
+            patch("app.services.invitation.member_repo.get", return_value=mock_member),
+            pytest.raises(AuthorizationError),
+        ):
+            service.invite("org-1", "user@example.com", "member", requester_id="user-1")
 
     def test_accept_raises_on_missing_token(self, service):
         from app.core.exceptions import NotFoundError
 
-        with patch("app.services.invitation.invitation_repo.get_by_token", return_value=None):
-            with pytest.raises(NotFoundError):
-                service.accept("bad-token", accepting_user_id="user-1")
+        with (
+            patch("app.services.invitation.invitation_repo.get_by_token", return_value=None),
+            pytest.raises(NotFoundError),
+        ):
+            service.accept("bad-token", accepting_user_id="user-1")
 
 
 {%- else %}

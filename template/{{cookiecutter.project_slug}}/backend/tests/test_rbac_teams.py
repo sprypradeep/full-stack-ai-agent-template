@@ -54,9 +54,11 @@ class TestRequireOrgRole:
         mock_membership.role = "admin"
 
         checker = RequireOrgRole("owner")
-        with patch("app.api.deps._member_repo.get", new=AsyncMock(return_value=mock_membership)):
-            with pytest.raises(AuthorizationError):
-                await checker(org=mock_org, user=mock_user, db=mock_db)
+        with (
+            patch("app.api.deps._member_repo.get", new=AsyncMock(return_value=mock_membership)),
+            pytest.raises(AuthorizationError),
+        ):
+            await checker(org=mock_org, user=mock_user, db=mock_db)
 
     @pytest.mark.anyio
     async def test_owner_passes_require_admin_plus(self, mock_db, mock_org, mock_user):
@@ -79,9 +81,11 @@ class TestRequireOrgRole:
         mock_membership.role = "member"
 
         checker = RequireOrgRole("owner", "admin")
-        with patch("app.api.deps._member_repo.get", new=AsyncMock(return_value=mock_membership)):
-            with pytest.raises(AuthorizationError):
-                await checker(org=mock_org, user=mock_user, db=mock_db)
+        with (
+            patch("app.api.deps._member_repo.get", new=AsyncMock(return_value=mock_membership)),
+            pytest.raises(AuthorizationError),
+        ):
+            await checker(org=mock_org, user=mock_user, db=mock_db)
 
     @pytest.mark.anyio
     async def test_non_member_fails(self, mock_db, mock_org, mock_user):
@@ -89,9 +93,11 @@ class TestRequireOrgRole:
         from app.core.exceptions import AuthorizationError
 
         checker = RequireOrgRole("owner", "admin", "member")
-        with patch("app.api.deps._member_repo.get", new=AsyncMock(return_value=None)):
-            with pytest.raises(AuthorizationError):
-                await checker(org=mock_org, user=mock_user, db=mock_db)
+        with (
+            patch("app.api.deps._member_repo.get", new=AsyncMock(return_value=None)),
+            pytest.raises(AuthorizationError),
+        ):
+            await checker(org=mock_org, user=mock_user, db=mock_db)
 
     @pytest.mark.anyio
     async def test_viewer_passes_require_any_role(self, mock_db, mock_org, mock_user):
@@ -263,18 +269,22 @@ class TestRequireOrgRole:
         mock_membership.role = "admin"
 
         checker = RequireOrgRole("owner")
-        with patch("app.api.deps._member_repo.get", return_value=mock_membership):
-            with pytest.raises(AuthorizationError):
-                checker(org=mock_org, user=mock_user, db=mock_db)
+        with (
+            patch("app.api.deps._member_repo.get", return_value=mock_membership),
+            pytest.raises(AuthorizationError),
+        ):
+            checker(org=mock_org, user=mock_user, db=mock_db)
 
     def test_non_member_fails(self, mock_db, mock_org, mock_user):
         from app.api.deps import RequireOrgRole
         from app.core.exceptions import AuthorizationError
 
         checker = RequireOrgRole("owner", "admin")
-        with patch("app.api.deps._member_repo.get", return_value=None):
-            with pytest.raises(AuthorizationError):
-                checker(org=mock_org, user=mock_user, db=mock_db)
+        with (
+            patch("app.api.deps._member_repo.get", return_value=None),
+            pytest.raises(AuthorizationError),
+        ):
+            checker(org=mock_org, user=mock_user, db=mock_db)
 
     @pytest.mark.parametrize("role,should_pass", [
         ("owner", True),
