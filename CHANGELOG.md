@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.8] - 2026-05-11
+
 ### Added
 
-- **Email module** (`enable_email`) — Transactional email system with three providers: Resend (async), SMTP (aiosmtplib), and Log (dev/test). Pre-rendered HTML/text templates stored in `emails/dist/` using `[[variable]]` substitution. `EmailService` facade with convenience wrappers for all email types: welcome, password reset, invitation, payment succeeded/failed, trial ending/expired, subscription canceled/changed, low credits, newsletter welcome
+- **Email module** (`enable_email`) — Transactional email system with three providers: Resend (async), SMTP (aiosmtplib), and Log (dev/test). Pre-rendered HTML/text templates stored in `emails/compiled/` using `[[variable]]` substitution. `EmailService` facade with convenience wrappers for all email types: welcome, password reset, invitation, payment succeeded/failed, trial ending/expired, subscription canceled/changed, low credits, newsletter welcome
 - **Email triggers wired** — `UserService.register()` fires `send_welcome`; `InvitationService.invite()` fires `send_invitation`; billing webhook handlers fire payment/subscription lifecycle emails using Stripe customer data (fail-open — email errors never break webhook processing)
 - **Stripe billing — rate limiting per plan** (`enable_rate_limiting`) — Sliding window rate limiter backed by Redis sorted sets (ZADD/ZREMRANGEBYSCORE/ZCARD pipeline) with in-memory fallback. `RateLimitRule` frozen dataclass (per_user, per_org, per_ip, configurable periods); `RateLimitCategory` constants; data-driven plan features override `DEFAULT_RATE_LIMITS`; `make_rate_limit_dep(category)` factory for FastAPI `Depends()`; admin bypass; fail-open on Redis error; HTTP 429 with `Retry-After` header
 - **Extended frontend billing dashboard** — `SubscriptionPanel` with 4 states (free/trial/active/canceled), cancel/reactivate dialogs, plan details; `CreditsPanel` with balance display, low-credit alert, top-up button, transaction history with type badges; `/billing/subscription` page with live plan cards; `/billing/credits` page. `useSubscription`, `useCredits`, `usePlans` hooks added to `use-billing.ts`
@@ -20,6 +22,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Newsletter signup** (`enable_newsletter_signup`) — `POST /newsletter/signup` endpoint; `NewsletterSignup` React component; sends welcome email via email service
 - **Changelog page** (`enable_changelog`) — `/changelog` route with release history, change type badges (feat/fix/improvement/chore)
 - **Pricing comparison page** (`enable_comparison_pages`) — `/pricing` route fetches live plans from API; monthly/annual toggle; plan feature list; trial days display; "Get Started" CTA
+
+### Fixed
+
+- **Email templates excluded by `.gitignore`** — Renamed `emails/dist/` → `emails/compiled/` to avoid the generic `dist/` gitignore rule silently stripping all compiled templates from generated projects
+- **`billing/facade.py` imports `usage_event_repo` unconditionally** — `app.repositories.usage_event` was imported in both PostgreSQL and SQLite branches regardless of `enable_credits_system`; projects generated with `enable_billing=True` + `enable_credits_system=False` crashed on startup with `ImportError`
+- **`func.case()` SQLAlchemy 2.x crash in `message_rating_repo`** — `func.case((condition, value), else_=0)` raised `TypeError: Function.__init__() got an unexpected keyword argument 'else_'`; replaced with `case(...)` imported directly from `sqlalchemy`
+- **Credits/usage dashboard widgets shown when `enable_credits_system=False`** — `UsageTimeline` and `TopModels` components were gated on `enable_billing` instead of `enable_credits_system`; they fetch from `/billing/me/credits/usage/...` endpoints that don't exist without the credits system, producing silent 404s and empty charts
+- **MongoDB projects: `admin.py` used SQLAlchemy `func.count`** — `AdminService` now has separate `{%- if use_postgresql or use_sqlite %}` / `{%- elif use_mongodb %}` branches; the MongoDB branch uses Beanie `Document.find().count()` and returns `[], 0` for Stripe events (not applicable to MongoDB projects)
+- **Admin `GET /conversations/{id}` returned 404 for other users' conversations** — `get_conversation` and `list_messages` route handlers now resolve `uid = None if current_user.role == "admin" else current_user.id`; `user_id=None` in the service layer bypasses the ownership check, allowing admins to read any conversation
+- **Frontend `?id=` URL param blocked by ownership guard** — `fetchConversations` removed the `response.items.some(c => c.id === urlId)` check before loading messages; any `?id=` value is now attempted unconditionally and a 404/403 from the server clears the ID silently (non-admins are still protected server-side)
+- **Admin conversations page "View" opened an in-page read-only preview** — Replaced the custom preview panel with a `Link` to `/chat?id=<conversation_id>`; admins now land on the full chat UI with the real message history
+- **Admin ratings page "Export" returned 404** — `window.open` was targeting `/api/v1/admin/ratings/export` (direct backend path) instead of `/api/admin/ratings/export` (the Next.js proxy route that attaches the auth cookie)
+- **CI integration test failures** — `generated_project_full` fixture now sets `frontend=FrontendType.NEXTJS` (required when `oauth_provider=GOOGLE`); MongoDB repository `__init__.py` import guard split so only SQL-only repos (`chat_file_repo`) are excluded from MongoDB projects; SQLite auth test fixed a mock type mismatch (`MagicMock` → `AsyncMock`)
 
 ## [0.2.7] - 2026-04-26
 
