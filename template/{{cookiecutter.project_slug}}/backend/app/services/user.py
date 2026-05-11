@@ -196,6 +196,9 @@ class UserService:
 {%- if cookiecutter.use_mongodb %}
         org_service = OrganizationService()
         await org_service.create_personal_org(str(user.id), user_in.email)
+{%- elif cookiecutter.use_sqlite %}
+        org_service = OrganizationService(self.db)
+        org_service.create_personal_org(user.id, user_in.email)
 {%- else %}
         org_service = OrganizationService(self.db)
         await org_service.create_personal_org(user.id, user_in.email)
@@ -264,6 +267,9 @@ class UserService:
 {%- if cookiecutter.use_mongodb %}
         org_service = OrganizationService()
         await org_service.create_personal_org(str(user.id), user.email)
+{%- elif cookiecutter.use_sqlite %}
+        org_service = OrganizationService(self.db)
+        org_service.create_personal_org(user.id, user.email)
 {%- else %}
         org_service = OrganizationService(self.db)
         await org_service.create_personal_org(user.id, user.email)
@@ -311,6 +317,9 @@ class UserService:
 {%- if cookiecutter.use_mongodb %}
         org_service = OrganizationService()
         await org_service.create_personal_org(str(user.id), user.email)
+{%- elif cookiecutter.use_sqlite %}
+        org_service = OrganizationService(self.db)
+        org_service.create_personal_org(user.id, user.email)
 {%- else %}
         org_service = OrganizationService(self.db)
         await org_service.create_personal_org(user.id, user.email)

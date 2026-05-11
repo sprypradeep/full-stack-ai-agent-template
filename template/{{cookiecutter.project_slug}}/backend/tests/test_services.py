@@ -307,9 +307,17 @@ class TestUserServiceSQLite:
     @pytest.mark.anyio
     async def test_register_success(self, user_service: UserService, mock_user: MockUser):
         """Test registering a new user."""
-        with patch("app.services.user.user_repo") as mock_repo:
+        with (
+            patch("app.services.user.user_repo") as mock_repo,
+{%- if cookiecutter.enable_teams %}
+            patch("app.services.user.OrganizationService") as mock_org_svc,
+{%- endif %}
+        ):
             mock_repo.get_by_email = MagicMock(return_value=None)
             mock_repo.create = MagicMock(return_value=mock_user)
+{%- if cookiecutter.enable_teams %}
+            mock_org_svc.return_value.create_personal_org = MagicMock()
+{%- endif %}
 
             user_in = UserCreate(
                 email="new@example.com",

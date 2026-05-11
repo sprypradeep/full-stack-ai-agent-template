@@ -172,6 +172,7 @@ class TestSeatLimitEnforcement:
         with patch("app.repositories.invitation_repo.get_by_token", return_value=inv), \
              patch("app.repositories.member_repo.get", return_value=None), \
              patch("app.repositories.organization_repo.get_by_id", return_value=org), \
+             patch("app.repositories.user_repo.get_by_id", return_value=_user()), \
              patch("app.repositories.member_repo.count_for_org", return_value=2):
             svc = InvitationService(mock_db)
             with pytest.raises(PaymentRequiredError):
@@ -186,6 +187,7 @@ class TestSeatLimitEnforcement:
         with patch("app.repositories.invitation_repo.get_by_token", return_value=inv), \
              patch("app.repositories.member_repo.get", return_value=None), \
              patch("app.repositories.organization_repo.get_by_id", return_value=org), \
+             patch("app.repositories.user_repo.get_by_id", return_value=_user()), \
              patch("app.repositories.member_repo.count_for_org", return_value=3), \
              patch("app.repositories.member_repo.create", return_value=MagicMock()), \
              patch("app.repositories.invitation_repo.accept", return_value=None):
@@ -202,6 +204,7 @@ class TestSeatLimitEnforcement:
         with patch("app.repositories.invitation_repo.get_by_token", return_value=inv), \
              patch("app.repositories.member_repo.get", return_value=None), \
              patch("app.repositories.organization_repo.get_by_id", return_value=org), \
+             patch("app.repositories.user_repo.get_by_id", return_value=_user()), \
              patch("app.repositories.member_repo.count_for_org", return_value=99), \
              patch("app.repositories.member_repo.create", return_value=MagicMock()), \
              patch("app.repositories.invitation_repo.accept", return_value=None):

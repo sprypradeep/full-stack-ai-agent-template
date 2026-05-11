@@ -25,12 +25,13 @@ depends_on = None
 def upgrade() -> None:
     op.add_column(
         "organizations",
-        sa.Column("stripe_subscription_id", sa.String(128), unique=True, nullable=True),
+        sa.Column("stripe_subscription_id", sa.String(128), nullable=True),
     )
     op.create_index(
         "ix_organizations_stripe_subscription_id",
         "organizations",
         ["stripe_subscription_id"],
+        unique=True,
     )
     op.add_column(
         "organizations",

@@ -101,6 +101,9 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
+{%- if cookiecutter.use_sqlite %}
+            render_as_batch=True,
+{%- endif %}
         )
 
         with context.begin_transaction():
