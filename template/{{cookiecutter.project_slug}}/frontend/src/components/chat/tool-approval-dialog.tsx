@@ -15,7 +15,6 @@ interface ToolApprovalDialogProps {
 
 export function ToolApprovalDialog({
   actionRequests,
-  reviewConfigs,
   onDecisions,
   disabled = false,
 }: ToolApprovalDialogProps) {

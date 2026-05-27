@@ -50,7 +50,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <div className="relative z-10">
             <span className="eyebrow-badge inline-flex items-center gap-2">
               <Sparkles className="h-3 w-3" aria-hidden />
-              An AI assistant that knows your team's work
+              An AI assistant that knows your team&apos;s work
             </span>
           </div>
 

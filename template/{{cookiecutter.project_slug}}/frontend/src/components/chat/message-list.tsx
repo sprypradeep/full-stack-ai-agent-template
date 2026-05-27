@@ -12,7 +12,6 @@ export function MessageList({ messages, onRegenerate }: MessageListProps) {
   // Calculate group positions for timeline connector
   const getGroupPosition = (
     message: ChatMessage,
-    index: number,
   ): "first" | "middle" | "last" | "single" | undefined => {
     if (!message.groupId) return undefined;
 
@@ -40,7 +39,7 @@ export function MessageList({ messages, onRegenerate }: MessageListProps) {
         <MessageItem
           key={message.id}
           message={message}
-          groupPosition={getGroupPosition(message, index)}
+          groupPosition={getGroupPosition(message)}
           onRegenerate={
             onRegenerate && index === lastAssistantIndex && !message.isStreaming
               ? () => onRegenerate(message.id)

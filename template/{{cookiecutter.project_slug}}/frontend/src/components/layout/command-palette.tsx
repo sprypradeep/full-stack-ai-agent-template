@@ -9,9 +9,15 @@ import {
 {%- endif %}
   ArrowRight,
   BookOpen,
+{%- if cookiecutter.enable_teams %}
   Building2,
+{%- endif %}
+{%- if cookiecutter.enable_billing %}
   CreditCard,
+{%- endif %}
+{%- if cookiecutter.enable_rag %}
   Database,
+{%- endif %}
   LayoutDashboard,
   LogOut,
   MessageSquare,
@@ -22,7 +28,9 @@ import {
   Star,
 {%- endif %}
   UserCircle,
+{%- if cookiecutter.enable_teams %}
   Users,
+{%- endif %}
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -100,11 +108,13 @@ export function CommandPalette() {
 
         <Group heading="Quick actions">
           <PaletteItem icon={Plus} label="Start new chat" onSelect={() => go(ROUTES.CHAT)} shortcut="⌘N" />
+{%- if cookiecutter.enable_rag %}
           <PaletteItem
             icon={Database}
             label="Upload to knowledge base"
             onSelect={() => go(ROUTES.RAG)}
           />
+{%- endif %}
 {%- if cookiecutter.enable_teams %}
           <PaletteItem icon={Users} label="Invite teammates" onSelect={() => go(ROUTES.ORGS)} />
 {%- endif %}

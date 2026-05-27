@@ -30,12 +30,9 @@ function AuthenticatedChatContainer() {
   const { fetchConversations } = useConversations();
   const prevConversationIdRef = useRef<string | null | undefined>(undefined);
 
-  const handleConversationCreated = useCallback(
-    (conversationId: string) => {
-      fetchConversations();
-    },
-    [fetchConversations],
-  );
+  const handleConversationCreated = useCallback(() => {
+    fetchConversations();
+  }, [fetchConversations]);
 
   const {
     messages,

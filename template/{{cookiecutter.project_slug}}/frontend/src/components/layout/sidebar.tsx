@@ -7,11 +7,17 @@ import { APP_NAME, ROUTES } from "@/lib/constants";
 import {
   LayoutDashboard,
   MessageSquare,
+{%- if cookiecutter.enable_teams and cookiecutter.enable_rag %}
   Database,
+{%- endif %}
   UserCircle,
   ShieldAlert,
+{%- if cookiecutter.enable_teams %}
   Building2,
+{%- endif %}
+{%- if cookiecutter.enable_billing %}
   CreditCard,
+{%- endif %}
 } from "lucide-react";
 import { useSidebarStore, useAuthStore } from "@/stores";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui";
@@ -74,23 +80,6 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
         </Link>
       )}
     </nav>
-  );
-}
-
-function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
-  return (
-    <div className="flex h-full flex-col">
-      <div className="flex h-14 items-center border-b px-4">
-        <Link
-          href={ROUTES.HOME}
-          className="flex items-center gap-2 font-semibold"
-          onClick={onNavigate}
-        >
-          <span>{APP_NAME}</span>
-        </Link>
-      </div>
-      <NavLinks onNavigate={onNavigate} />
-    </div>
   );
 }
 

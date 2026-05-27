@@ -15,10 +15,16 @@ import {
   Menu,
   LayoutDashboard,
   MessageSquare,
+{%- if cookiecutter.enable_teams and cookiecutter.enable_rag %}
   Database,
+{%- endif %}
   UserCircle,
+{%- if cookiecutter.enable_teams %}
   Building2,
+{%- endif %}
+{%- if cookiecutter.enable_billing %}
   CreditCard,
+{%- endif %}
   ShieldCheck,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui";

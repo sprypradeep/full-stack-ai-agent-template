@@ -1,6 +1,6 @@
 {% raw %}"use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   AlertCircle,
   Download,
@@ -338,7 +338,6 @@ function AudioViewer({ url, filename }: { url: string; filename: string }) {
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 p-6">
       <FileAudio className="text-foreground/35 h-12 w-12" />
       <p className="text-foreground/65 line-clamp-2 max-w-full text-center text-xs">{filename}</p>
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <audio controls src={url} className="w-full max-w-md" />
     </div>
   );
@@ -347,7 +346,6 @@ function AudioViewer({ url, filename }: { url: string; filename: string }) {
 function VideoViewer({ url, filename }: { url: string; filename: string }) {
   return (
     <div className="flex min-h-0 flex-1 items-center justify-center bg-black p-3">
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <video controls src={url} title={filename} className="max-h-full max-w-full" />
     </div>
   );

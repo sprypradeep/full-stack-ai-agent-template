@@ -16,7 +16,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-  Badge,
   Button,
   Input,
   Label,

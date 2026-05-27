@@ -174,7 +174,6 @@ export function ChatControls({
         }
       })
       .catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── Settings state ──────────────────────────────────────────────────────

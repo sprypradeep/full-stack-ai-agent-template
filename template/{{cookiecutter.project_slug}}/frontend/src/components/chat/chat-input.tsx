@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Button, Badge, Spinner } from "@/components/ui";
-import { Send, Mic, MicOff, Paperclip, X, Image as ImageIcon, FileText } from "lucide-react";
+import { Send, Mic, MicOff, Paperclip, X, FileText } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { uploadFile, getFileUrl, type FileUploadResponse } from "@/lib/file-api";

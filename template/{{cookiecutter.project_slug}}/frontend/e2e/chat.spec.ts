@@ -170,11 +170,10 @@ test.describe("Conversation Persistence", () => {
   test("should show conversation list", async ({ page }) => {
     await page.goto("/chat");
 
-    // Should have some way to view conversation history
-    const conversationList = page.getByRole("list").or(
-      page.locator("[data-testid='conversation-list']")
-    );
-    // List may or may not be visible depending on UI
+    // Should have some way to view conversation history.
+    // List may or may not be visible depending on UI — just ensure the
+    // locator resolves without throwing.
+    void page.getByRole("list").or(page.locator("[data-testid='conversation-list']"));
   });
 
   test("should create new conversation", async ({ page }) => {

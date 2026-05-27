@@ -19,7 +19,6 @@ export function JsonLd({ data }: JsonLdProps) {
   return (
     <script
       type="application/ld+json"
-      // eslint-disable-next-line react/no-danger -- escaped above; can't break out of <script>
       dangerouslySetInnerHTML={{ __html: safeStringify(data) }}
     />
   );

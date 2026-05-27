@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
+{%- if cookiecutter.enable_teams and cookiecutter.enable_rag %}
   Database,
+{%- endif %}
   LayoutDashboard,
   MessageSquare,
   Search,

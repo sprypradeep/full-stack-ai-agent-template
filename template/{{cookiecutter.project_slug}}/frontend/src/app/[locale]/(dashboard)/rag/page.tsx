@@ -34,7 +34,6 @@ import {
   CheckCircle,
   XCircle,
   ChevronLeft,
-  Download,
   Eye,
   RefreshCw,
 } from "lucide-react";
