@@ -1,6 +1,6 @@
 {% raw %}"use client";
 
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import {
   Area,
   AreaChart,
@@ -94,7 +94,17 @@ export function parseChartResult(result: unknown): ChartSpec | null {
   return null;
 }
 
-export function ChartMessage({ spec }: { spec: ChartSpec }) {
+/**
+ * Memoized so it only re-renders when the chart `spec` actually changes. During
+ * streaming, MessageItem re-renders on every text/thinking delta — without
+ * memoization, Recharts' ResponsiveContainer + ResizeObserver fire on each one
+ * and can momentarily report container size as -1 mid-layout. That triggers a
+ * `setState` inside Recharts' internal `RenderedTicksReporter` which feeds
+ * back into the store-subscribed re-render chain → infinite update loop.
+ */
+export const ChartMessage = memo(ChartMessageInner);
+
+function ChartMessageInner({ spec }: { spec: ChartSpec }) {
   const palette = useMemo(
     () =>
       spec.style?.palette && spec.style.palette.length > 0 ? spec.style.palette : DEFAULT_PALETTE,
@@ -310,8 +320,8 @@ export function ChartMessage({ spec }: { spec: ChartSpec }) {
   return (
     <div className="bg-card overflow-hidden rounded-xl border p-3 sm:p-4">
       <p className="text-foreground mb-3 text-sm font-semibold">{spec.title}</p>
-      <div className="h-[300px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="h-[300px] w-full" style={{ minWidth: 1, minHeight: 1 }}>
+        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
           {renderChart()}
         </ResponsiveContainer>
       </div>

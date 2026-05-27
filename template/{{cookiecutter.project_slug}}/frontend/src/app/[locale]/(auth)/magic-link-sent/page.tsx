@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+{% raw %}import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Mail } from "lucide-react";
 
@@ -29,14 +29,19 @@ export default async function MagicLinkSentPage({ searchParams }: PageProps) {
   const { email } = await searchParams;
 
   return (
-    <div className="space-y-7 text-center">
-      <div className="bg-brand/15 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
-        <Mail className="text-foreground h-6 w-6" />
+    <div className="space-y-8 text-center">
+      <div
+        className="bg-brand/15 mx-auto flex h-16 w-16 items-center justify-center rounded-full"
+        style={{ boxShadow: "0 0 40px oklch(from var(--color-brand) l c h / 0.4)" }}
+      >
+        <Mail className="text-foreground h-7 w-7" />
       </div>
 
       <div className="space-y-2">
         <span className="eyebrow text-foreground/55">Magic link</span>
-        <h1 className="text-display-md text-foreground">Check your email</h1>
+        <h1 className="text-display-md text-foreground [&_em]:font-accent [&_em]:font-normal [&_em]:italic">
+          Inbox, <em>incoming.</em>
+        </h1>
         <p className="text-foreground/70 text-sm">
           We sent a sign-in link
           {email ? (
@@ -45,7 +50,7 @@ export default async function MagicLinkSentPage({ searchParams }: PageProps) {
               to <span className="text-foreground font-medium">{email}</span>
             </>
           ) : null}
-          . Click the link in the email to continue. The link expires in 15 minutes.
+          . Click it to continue — expires in 15 minutes.
         </p>
       </div>
 
@@ -72,3 +77,4 @@ export default async function MagicLinkSentPage({ searchParams }: PageProps) {
     </div>
   );
 }
+{% endraw %}

@@ -1,24 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useChat } from "@/hooks";
+import { ChatControls } from "./chat-controls";
 import { ChatEmptyState } from "./chat-empty-state";
 import { ChatInput } from "./chat-input";
-import { ChatSettings } from "./chat-settings";
 import { FilePreviewPanel } from "./file-preview-panel";
-{%- if cookiecutter.enable_teams and cookiecutter.enable_rag %}
-import { KBSelector } from "./kb-selector";
-{%- endif %}
 import { MessageList } from "./message-list";
 import { PendingMessages } from "./pending-messages";
 import { ToolApprovalDialog } from "./tool-approval-dialog";
-import { ChevronDown, Check } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui";
 import type { PendingApproval, Decision } from "@/types";
 import { useConversationStore, useChatStore } from "@/stores";
 import { useConversations } from "@/hooks";
@@ -31,8 +21,11 @@ export function ChatContainer() {
 }
 
 function AuthenticatedChatContainer() {
-  const { currentConversationId, currentMessages, isLoading: isConversationLoading } =
-    useConversationStore();
+  const {
+    currentConversationId,
+    currentMessages,
+    isLoading: isConversationLoading,
+  } = useConversationStore();
   const { addMessage: addChatMessage } = useChatStore();
   const { fetchConversations } = useConversations();
   const prevConversationIdRef = useRef<string | null | undefined>(undefined);
@@ -149,9 +142,7 @@ function AuthenticatedChatContainer() {
           rating_count: msg.rating_count ?? undefined,
           files:
             "files" in msg &&
-            Array.isArray(
-              (msg as unknown as { files?: { id: string; filename: string }[] }).files,
-            )
+            Array.isArray((msg as unknown as { files?: { id: string; filename: string }[] }).files)
               ? (
                   msg as unknown as {
                     files: {
@@ -223,7 +214,7 @@ function AuthenticatedChatContainer() {
     },
     openSettings: () => {
       // Best-effort: focus the settings popover trigger if it's mounted.
-      document.querySelector<HTMLButtonElement>('[data-chat-settings-trigger]')?.click();
+      document.querySelector<HTMLButtonElement>("[data-chat-settings-trigger]")?.click();
     },
   };
 
@@ -251,57 +242,6 @@ function AuthenticatedChatContainer() {
       pendingApproval={pendingApproval}
       onResumeDecisions={sendResumeDecisions}
     />
-  );
-}
-
-function ModelSelector({ onChange }: { onChange: (model: string | null) => void }) {
-  const [availableModels, setAvailableModels] = useState<{ value: string; label: string }[]>([
-    { value: "", label: "Default" },
-  ]);
-  const [selected, setSelected] = useState<{ value: string; label: string }>(
-    availableModels[0] ?? { value: "", label: "Default" },
-  );
-
-  useEffect(() => {
-    fetch("/api/v1/agent/models", { credentials: "include" })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (data?.models) {
-          const models = [
-            { value: "", label: `Default (${data.default})` },
-            ...data.models.map((m: string) => ({ value: m, label: m })),
-          ];
-          setAvailableModels(models);
-          setSelected(models[0]);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button className="text-foreground/55 hover:bg-foreground/5 hover:text-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-mono text-[11px] tracking-wider uppercase transition-colors">
-          {selected.label}
-          <ChevronDown className="h-3 w-3" />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        {availableModels.map((m) => (
-          <DropdownMenuItem
-            key={m.value}
-            onClick={() => {
-              setSelected(m);
-              onChange(m.value || null);
-            }}
-            className="flex items-center justify-between text-xs"
-          >
-            {m.label}
-            {selected.value === m.value && <Check className="h-3.5 w-3.5" />}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
   );
 }
 
@@ -351,80 +291,75 @@ function ChatUI({
 }: ChatUIProps) {
   return (
     <div className="flex h-full w-full">
-      <div className="mx-auto flex h-full min-w-0 max-w-4xl flex-1 flex-col">
-      <div
-        ref={scrollContainerRef}
-        className="flex-1 scrollbar-thin overflow-y-auto px-2 py-4 sm:px-4 sm:py-6"
-      >
-        {isLoadingConversation ? (
-          <ConversationSkeleton />
-        ) : messages.length === 0 ? (
-          <div className="flex h-full items-center">
-            <ChatEmptyState onPick={(prompt) => sendMessage(prompt)} />
-          </div>
-        ) : (
-          <MessageList messages={messages} onRegenerate={onRegenerate} />
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Human-in-the-Loop: Tool Approval Dialog */}
-      {pendingApproval && onResumeDecisions && (
-        <div className="px-2 pb-2 sm:px-4 sm:pb-2">
-          <ToolApprovalDialog
-            actionRequests={pendingApproval.actionRequests}
-            reviewConfigs={pendingApproval.reviewConfigs}
-            onDecisions={onResumeDecisions}
-            disabled={!isConnected}
-          />
+      <div className="mx-auto flex h-full max-w-4xl min-w-0 flex-1 flex-col">
+        <div
+          ref={scrollContainerRef}
+          className="flex-1 scrollbar-thin overflow-y-auto px-2 py-4 sm:px-4 sm:py-6"
+        >
+          {isLoadingConversation ? (
+            <ConversationSkeleton />
+          ) : messages.length === 0 ? (
+            <div className="flex h-full items-center">
+              <ChatEmptyState onPick={(prompt) => sendMessage(prompt)} />
+            </div>
+          ) : (
+            <MessageList messages={messages} onRegenerate={onRegenerate} />
+          )}
+          <div ref={messagesEndRef} />
         </div>
-      )}
 
-      <div className="px-2 pb-2 sm:px-4 sm:pb-4">
-        {queuedMessages && queuedMessages.length > 0 && onCancelQueued && (
-          <PendingMessages messages={queuedMessages} onCancel={onCancelQueued} />
-        )}
-        <div className="bg-card border-foreground/10 focus-within:border-foreground/30 rounded-2xl border shadow-sm transition-colors">
-          <div className="px-3 pt-3 sm:px-4 sm:pt-4">
-            <ChatInput
-              onSend={sendMessage}
-              disabled={!isConnected || !!pendingApproval}
-              isProcessing={isProcessing}
-              slashContext={slashContext}
-              commands={slashCommands}
+        {/* Human-in-the-Loop: Tool Approval Dialog */}
+        {pendingApproval && onResumeDecisions && (
+          <div className="px-2 pb-2 sm:px-4 sm:pb-2">
+            <ToolApprovalDialog
+              actionRequests={pendingApproval.actionRequests}
+              reviewConfigs={pendingApproval.reviewConfigs}
+              onDecisions={onResumeDecisions}
+              disabled={!isConnected}
             />
           </div>
-          <div className="border-foreground/8 flex items-center justify-between border-t px-3 py-2 sm:px-4">
-            <div className="flex items-center gap-2">
-              <span
-                className={`inline-flex items-center gap-1.5 font-mono text-[10px] tracking-wider uppercase ${isConnected ? "text-foreground/55" : "text-destructive"}`}
-              >
-                <span
-                  className={`inline-block h-1.5 w-1.5 rounded-full ${
-                    isConnected ? "bg-brand" : "bg-destructive"
-                  } ${isConnected ? "animate-pulse" : ""}`}
-                />
-                {isConnected ? "Live" : "Offline"}
-              </span>
+        )}
+
+        <div className="px-2 pb-2 sm:px-4 sm:pb-4">
+          {queuedMessages && queuedMessages.length > 0 && onCancelQueued && (
+            <PendingMessages messages={queuedMessages} onCancel={onCancelQueued} />
+          )}
+          <div className="bg-card border-foreground/10 focus-within:border-foreground/30 rounded-2xl border shadow-sm transition-colors">
+            <div className="px-3 pt-3 sm:px-4 sm:pt-4">
+              <ChatInput
+                onSend={sendMessage}
+                disabled={!isConnected || !!pendingApproval}
+                isProcessing={isProcessing}
+                slashContext={slashContext}
+                commands={slashCommands}
+              />
             </div>
-            <div className="flex items-center gap-1">
-              {%- if cookiecutter.enable_teams and cookiecutter.enable_rag %}
-              <KBSelector />
-              {%- endif %}
-              {onModelChange && <ModelSelector onChange={onModelChange} />}
-              {onTemperatureChange && onThinkingEffortChange && (
-                <ChatSettings
+            <div className="border-foreground/8 flex items-center justify-between border-t px-3 py-2 sm:px-4">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`inline-flex items-center gap-1.5 font-mono text-[10px] tracking-wider uppercase ${isConnected ? "text-foreground/55" : "text-destructive"}`}
+                >
+                  <span
+                    className={`inline-block h-1.5 w-1.5 rounded-full ${
+                      isConnected ? "bg-brand" : "bg-destructive"
+                    } ${isConnected ? "animate-pulse" : ""}`}
+                  />
+                  {isConnected ? "Live" : "Offline"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <ChatControls
+                  onModelChange={onModelChange}
                   onTemperatureChange={onTemperatureChange}
                   onThinkingEffortChange={onThinkingEffortChange}
                 />
-              )}
+              </div>
             </div>
           </div>
+          <p className="text-foreground/40 mt-2 text-center font-mono text-[10px] tracking-wider uppercase">
+            AI can make mistakes. Verify important information.
+          </p>
         </div>
-        <p className="text-foreground/40 mt-2 text-center font-mono text-[10px] tracking-wider uppercase">
-          AI can make mistakes. Verify important information.
-        </p>
-      </div>
       </div>
       <FilePreviewPanel />
     </div>

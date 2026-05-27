@@ -20,7 +20,7 @@ const navigation = [
   { name: "Dashboard", href: ROUTES.DASHBOARD, icon: LayoutDashboard },
   { name: "Chat", href: ROUTES.CHAT, icon: MessageSquare },
 {%- if cookiecutter.enable_teams and cookiecutter.enable_rag %}
-  { name: "Knowledge Bases", href: ROUTES.KB, icon: Database },
+  { name: "RAG", href: ROUTES.KB, icon: Database },
 {%- endif %}
 {%- if cookiecutter.enable_teams %}
   { name: "Organizations", href: ROUTES.ORGS, icon: Building2 },

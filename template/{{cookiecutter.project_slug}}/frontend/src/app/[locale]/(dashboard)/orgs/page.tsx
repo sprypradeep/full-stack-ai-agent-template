@@ -6,6 +6,7 @@ import { ArrowRightLeft, Building2, Camera, Plus, Settings } from "lucide-react"
 import { toast } from "sonner";
 
 import { CreateOrgDialog } from "@/components/teams";
+import { PageHero } from "@/components/dashboard/page-hero";
 import { EmptyState, LoadingState } from "@/components/states";
 import { useOrganizations } from "@/hooks";
 import { cn } from "@/lib/utils";
@@ -57,28 +58,21 @@ export default function OrgsPage() {
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-foreground/55 font-mono text-[11px] tracking-wider uppercase">
-            Organizations
-          </p>
-          <h1 className="font-display text-foreground mt-1 text-3xl font-bold tracking-tight sm:text-4xl">
-            Workspaces and teams
-          </h1>
-          <p className="text-foreground/65 mt-1 max-w-xl text-sm">
-            Switch between workspaces, manage members, and create new organizations to collaborate
-            with your team.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => setCreateOpen(true)}
-          className="bg-foreground text-background hover:bg-foreground/90 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          New organization
-        </button>
-      </header>
+      <PageHero
+        eyebrow="Organizations"
+        title={
+          <>
+            Workspaces and <em>teams.</em>
+          </>
+        }
+        description="Switch between workspaces, manage members, and spin up new organizations to collaborate with your team."
+        stats={
+          orgs.length > 0
+            ? [{ value: orgs.length, label: orgs.length === 1 ? "workspace" : "workspaces" }]
+            : undefined
+        }
+        cta={{ label: "New organization", onClick: () => setCreateOpen(true), icon: Plus }}
+      />
 
       {isLoading ? (
         <LoadingState variant="skeleton-list" rows={3} />
@@ -97,10 +91,19 @@ export default function OrgsPage() {
               <li
                 key={org.id}
                 className={cn(
-                  "border-border bg-card flex flex-wrap items-center gap-4 rounded-2xl border p-4 transition-colors sm:p-5",
-                  isActive ? "ring-brand/40 ring-2" : "hover:border-foreground/20",
+                  "relative flex flex-wrap items-center gap-4 rounded-2xl border p-4 transition-all sm:p-5",
+                  isActive
+                    ? "border-brand/40 bg-brand/[0.06]"
+                    : "border-border bg-card hover:border-foreground/25 hover:-translate-y-0.5",
                 )}
               >
+                {isActive && (
+                  <span
+                    aria-hidden
+                    className="bg-brand absolute top-1/2 left-0 h-8 w-0.5 -translate-y-1/2 rounded-r-full"
+                    style={{ boxShadow: "0 0 8px var(--color-brand)" }}
+                  />
+                )}
                 <button
                   type="button"
                   className="group bg-brand/15 text-foreground relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full"
@@ -128,9 +131,7 @@ export default function OrgsPage() {
 
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-foreground truncate text-base font-semibold">
-                      {org.name}
-                    </h2>
+                    <h2 className="text-foreground truncate text-base font-semibold">{org.name}</h2>
                     {org.is_personal && (
                       <span className="border-foreground/15 text-foreground/65 rounded-full border px-2 py-0.5 text-[10px] font-medium tracking-wide uppercase">
                         Personal
@@ -202,5 +203,4 @@ export default function OrgsPage() {
     </div>
   );
 }
-
 {% endraw %}

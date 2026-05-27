@@ -161,7 +161,11 @@ class AssistantAgent:
         thinking_effort: str | None = None,
     ):
         self.model_name = model_name or settings.AI_MODEL
-        self.temperature = temperature if temperature is not None else settings.AI_TEMPERATURE
+        # ``temperature`` stays ``None`` when caller didn't set it — don't fall
+        # back to settings.AI_TEMPERATURE here. Reasoning/o-series models
+        # (gpt-5.5, o1, …) reject the parameter entirely, so we only forward
+        # it to the model when explicitly requested.
+        self.temperature = temperature
         self.thinking_effort = thinking_effort if thinking_effort is not None else (
             settings.AI_THINKING_EFFORT if settings.AI_THINKING_ENABLED else None
         )
@@ -193,7 +197,9 @@ class AssistantAgent:
         # model reasons internally and we never see ThinkingPart events.
         # ``openai_*``-prefixed fields on TypedDict settings are silently
         # ignored by other providers, so this is safe to apply unconditionally.
-        model_settings: ModelSettings = ModelSettings(temperature=self.temperature)
+        model_settings: ModelSettings = ModelSettings()
+        if self.temperature is not None:
+            model_settings["temperature"] = self.temperature
         if self.thinking_effort:
             model_settings["openai_reasoning_summary"] = "auto"  # type: ignore[typeddict-unknown-key]  # ty: ignore[invalid-key]
 

@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { Download } from "lucide-react";
 
+import { PageHero } from "@/components/dashboard/page-hero";
 import { LoadingState } from "@/components/states";
 import { apiClient } from "@/lib/api-client";
 
@@ -161,28 +162,25 @@ export default function UsageDashboardPage() {
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-8 pb-12">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-foreground/55 font-mono text-[11px] tracking-wider uppercase">
-            Billing · Usage
-          </p>
-          <h1 className="font-display text-foreground mt-1 text-3xl font-bold tracking-tight sm:text-4xl">
-            Token consumption
-          </h1>
-          <p className="text-foreground/65 mt-1 max-w-xl text-sm">
-            Credits and tokens used across this organization in the last 30 days, broken down by
-            model and day.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={handleExport}
-          className="border-foreground/15 hover:border-foreground/40 text-foreground inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors"
-        >
-          <Download className="h-4 w-4" />
-          Export CSV
-        </button>
-      </header>
+      <PageHero
+        eyebrow="Billing · Usage"
+        title={
+          <>
+            Token <em>consumption.</em>
+          </>
+        }
+        description="Credits and tokens used across this organization in the last 30 days, broken down by model and day."
+        actions={
+          <button
+            type="button"
+            onClick={handleExport}
+            className="border-foreground/15 hover:border-foreground/40 text-foreground inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors"
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </button>
+        }
+      />
 
       {isLoading ? (
         <LoadingState variant="stats" rows={3} />
@@ -252,10 +250,7 @@ export default function UsageDashboardPage() {
         <ChartCard title="Per-model breakdown">
           <div className="divide-foreground/10 -mx-1 divide-y">
             {aggregate.by_model.map((m) => (
-              <div
-                key={m.model}
-                className="grid grid-cols-4 gap-4 px-1 py-3 text-sm tabular-nums"
-              >
+              <div key={m.model} className="grid grid-cols-4 gap-4 px-1 py-3 text-sm tabular-nums">
                 <div className="col-span-2 min-w-0">
                   <p className="text-foreground truncate font-medium">{m.model}</p>
                   <p className="text-foreground/55 text-xs">{m.provider}</p>
@@ -268,9 +263,7 @@ export default function UsageDashboardPage() {
                 </div>
                 <div>
                   <p className="text-foreground/55 text-xs">Credits</p>
-                  <p className="text-foreground font-mono">
-                    {m.credits_charged.toLocaleString()}
-                  </p>
+                  <p className="text-foreground font-mono">{m.credits_charged.toLocaleString()}</p>
                 </div>
               </div>
             ))}
@@ -280,5 +273,4 @@ export default function UsageDashboardPage() {
     </div>
   );
 }
-
 {% endraw %}

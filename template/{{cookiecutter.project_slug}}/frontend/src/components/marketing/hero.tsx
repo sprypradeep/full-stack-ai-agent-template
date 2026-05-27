@@ -20,7 +20,7 @@ interface HeroCta {
 
 interface HeroProps {
   eyebrow?: string;
-  /** Headline supports `<Highlight>` and `<em>` (italic accent serif). */
+  /** Headline supports `<em>` for italic accent emphasis. */
   title: ReactNode;
   description: string;
   primaryCta: HeroCta;

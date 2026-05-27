@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.10] - 2026-05-27
+
+### Added
+
+- **Frontend `PageHero` component** — shared `components/dashboard/page-hero.tsx` (151 lines) used by admin, billing, settings, KB, organizations, and dashboard pages so headers share a single typographic rhythm and breadcrumb pattern instead of each page hand-rolling its own
+- **Chat controls panel** — new `components/chat/chat-controls.tsx` (586 lines) consolidates model picker, knowledge-base toggles, and conversation settings into one panel. Replaces the split `chat-settings.tsx` (deleted) and `kb-selector.tsx` (deleted) — fewer UI surfaces, no more duplicate KB lookups
+- **Auth screens redesigned** — login, register, reset-password, and forgot-password forms now use a split-screen layout (product pitch on the right, form on the left), proper OAuth divider, and consistent form spacing. Generated `(auth)/layout.tsx` + `magic-link-sent/page.tsx` updated to match
+
+### Changed
+
+- **Marketing site refreshed** — hero, pricing teaser, final CTA, marketing footer rebuilt with cleaner typography, monthly/annual toggle on pricing, and configurable footer columns (`footer-config.ts`)
+- **Knowledge bases page redesigned** — `kb/kb-list.tsx` rewritten (266-line refactor) with card layout, per-base actions, and clearer empty-state copy
+- **Dashboard / admin / settings / billing pages** — every page header migrated to the new `PageHero`; layout, sidebar, and command palette tightened. Globals CSS adjusted for the new spacing scale
+- **README** — banner image at the top replaced with the live chat demo video so the first thing a visitor sees is the product running; merged the separate "web search" and "chart generation" demos into one (the new demo covers both); refreshed every product screenshot from `assets/new2/`; pruned ~40 unused assets (`assets/new/`, `assets/chat/`, old marketing PNGs, button SVGs)
+
+### Fixed
+
+- **No-AI projects (`use_ai=False`) failed to build** — generator now removes every AI-only surface that previously leaked through and broke imports: `conversation` / `conversation_share` / `message_rating` / `user_slash_command` models + repos + services, the `agent`, `admin_conversations`, `admin_ratings`, and `me_slash_commands` routes, and the corresponding frontend pages (`chat/`, `admin/conversations`, `admin/ratings`, `settings/slash-commands`), API proxies, and data hooks. RAG-off projects also drop the KB UI (`components/kb`, `app/api/kb`, `(dashboard)/kb`, `use-knowledge-bases.ts`, `types/knowledge-base.ts`) so `next build` no longer fails on orphaned imports
+- **Backend modules unconditionally pulled in chat code** — `api/deps.py`, `api/routes/v1/__init__.py`, `db/models/__init__.py`, `repositories/__init__.py`, `schemas/__init__.py`, `services/admin.py`, `repositories/user.py`, and `admin.py` (SQLAdmin) had `use_database`-gated imports of `Conversation`/`Message`/`MessageRating`/etc. that crashed in no-AI projects. Re-gated to `use_ai` and added literal-zero fallbacks for conversation counts in admin stats / user listings (PG, SQLite, MongoDB)
+- **CLI: Slack/Telegram channels silently accepted without an AI framework** — `ProjectConfig` validation now rejects `--slack`/`--telegram` when `use_ai` is off (the channel adapters only exist to relay messages to `AgentInvocationService`), with a quick-fix message
+- **`temperature` forwarded to reasoning models (gpt-5.5, o1)** — those models reject the parameter entirely, so `AssistantAgent` no longer falls back to `settings.AI_TEMPERATURE`; it stays `None` and is only forwarded to `ModelSettings` when the caller explicitly sets it
+- **`reranker.py` Cohere init imported the SDK only to discard it** — replaced the `from cohere import AsyncClient` probe with `importlib.util.find_spec("cohere")` so we check availability without polluting imports
+- **Auth components barrel exported password forms in OAuth-only builds** — `components/auth/index.ts` now gates the local-auth form exports behind `use_local_auth`, so OAuth-only projects don't ship dead code that references missing endpoints
+
 ## [0.2.9] - 2026-05-17
 
 ### Added

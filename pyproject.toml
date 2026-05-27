@@ -1,6 +1,6 @@
 [project]
 name = "fastapi-fullstack"
-version = "0.2.9"
+version = "0.2.10"
 description = "Full-stack FastAPI + Next.js template generator with PydanticAI/LangChain agents, WebSocket streaming, 20+ enterprise integrations, and Logfire/LangSmith observability. Ship AI apps fast. CLI tool to generate production-ready FastAPI + Next.js projects with AI agents, auth, and observability."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -145,10 +145,14 @@ line-ending = "auto"
 python-version = "3.11"
 
 [tool.ty.src]
-# Exclude Jinja2 template files and integration tests with dynamic imports
+# Exclude Jinja2 template files, integration tests with dynamic imports,
+# and the generated-project snapshot (it's a standalone FastAPI app with its
+# own backend/pyproject.toml deps — type-checking it from the root env
+# produces noise from unresolved imports of fastapi/sqlalchemy/etc.).
 exclude = [
     "template/",
     "tests/",
+    "ai_agent_test/",
 ]
 
 [tool.pytest.ini_options]

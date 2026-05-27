@@ -31,7 +31,7 @@ const adminNavItems = [
   { name: "Dashboard", href: ROUTES.DASHBOARD, icon: LayoutDashboard, adminOnly: false },
   { name: "Chat", href: ROUTES.CHAT, icon: MessageSquare, adminOnly: false },
 {%- if cookiecutter.enable_teams and cookiecutter.enable_rag %}
-  { name: "Knowledge Bases", href: ROUTES.KB, icon: Database, adminOnly: false },
+  { name: "RAG", href: ROUTES.KB, icon: Database, adminOnly: false },
 {%- endif %}
 {%- if cookiecutter.enable_teams %}
   { name: "Organizations", href: ROUTES.ORGS, icon: Building2, adminOnly: false },

@@ -17,13 +17,13 @@ export interface FooterColumn {
 
 export function buildMarketingNavLinks(t: T) {
   return [
-    { label: t("nav.features"), href: `${ROUTES.HOME}#features` },
-    { label: t("nav.howItWorks"), href: `${ROUTES.HOME}#how` },
+    { label: t("nav.platform"), href: `${ROUTES.HOME}#features` },
+    { label: t("nav.solutions"), href: `${ROUTES.HOME}#how` },
     { label: t("nav.pricing"), href: ROUTES.PRICING },
 {%- if cookiecutter.enable_marketing_site %}
-    { label: t("nav.blog"), href: "/blog" },
+    { label: t("nav.customers"), href: "/blog" },
 {%- endif %}
-    { label: t("nav.faq"), href: `${ROUTES.HOME}#faq` },
+    { label: t("nav.resources"), href: `${ROUTES.HOME}#faq` },
   ];
 }
 
@@ -88,6 +88,10 @@ const enFallback: T = (key) => {
     "nav.pricing": "Pricing",
     "nav.faq": "FAQ",
     "nav.blog": "Blog",
+    "nav.platform": "Platform",
+    "nav.solutions": "Solutions",
+    "nav.customers": "Customers",
+    "nav.resources": "Resources",
     "nav.changelog": "Changelog",
     "nav.about": "About",
     "nav.contact": "Contact",

@@ -1,4 +1,4 @@
-"use client";
+{% raw %}"use client";
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -10,6 +10,7 @@ import { useChatSidebarStore } from "@/stores";
 import {
   Archive,
   ArchiveRestore,
+  ArrowUpRight,
   ChevronLeft,
   ChevronRight,
   MessageSquare,
@@ -60,14 +61,21 @@ function ConversationItem({
   return (
     <div
       className={cn(
-        "group relative flex min-h-[44px] cursor-pointer items-center gap-2 rounded-lg px-3 py-3 text-sm transition-colors",
+        "group relative flex min-h-[44px] cursor-pointer items-center gap-2 rounded-xl px-3 py-3 text-sm transition-all",
         isActive
-          ? "bg-secondary text-secondary-foreground"
-          : "text-muted-foreground hover:bg-secondary/50 hover:text-secondary-foreground",
+          ? "bg-brand/[0.08] text-foreground border-brand/30 border"
+          : "text-muted-foreground hover:bg-secondary/50 hover:text-secondary-foreground border border-transparent",
       )}
       onClick={onSelect}
     >
-      <MessageSquare className="h-4 w-4 shrink-0" />
+      {isActive && (
+        <span
+          aria-hidden
+          className="bg-brand absolute top-1/2 left-0 h-5 w-0.5 -translate-y-1/2 rounded-r-full"
+          style={{ boxShadow: "0 0 8px var(--color-brand)" }}
+        />
+      )}
+      <MessageSquare className={cn("h-4 w-4 shrink-0", isActive && "text-brand")} />
       {isEditing ? (
         <input
           type="text"
@@ -233,15 +241,19 @@ function ConversationList({
   return (
     <>
       <div className="p-3">
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-10 w-full justify-start gap-2"
+        <button
+          type="button"
           onClick={handleNewChat}
+          className="bg-foreground text-background hover:bg-foreground/90 group flex h-10 w-full items-center justify-between gap-2 rounded-full pr-1.5 pl-4 text-sm font-medium transition-colors"
         >
-          <MessageSquarePlus className="h-4 w-4" />
-          {t("newChat")}
-        </Button>
+          <span className="inline-flex items-center gap-2">
+            <MessageSquarePlus className="h-4 w-4" />
+            {t("newChat")}
+          </span>
+          <span className="bg-brand text-brand-foreground flex h-7 w-7 items-center justify-center rounded-full transition-transform group-hover:rotate-45">
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </span>
+        </button>
       </div>
 
       <div className="px-3 pb-2">
@@ -277,19 +289,23 @@ function ConversationList({
             ))}
           </div>
         ) : visible.length === 0 ? (
-          <div className="text-muted-foreground flex flex-col items-center justify-center py-8 text-center text-sm">
-            {isArchivedView ? (
-              <Archive className="mb-2 h-8 w-8 opacity-50" />
-            ) : (
-              <MessageSquare className="mb-2 h-8 w-8 opacity-50" />
-            )}
-            <p>
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <span
+              aria-hidden
+              className="bg-brand/15 text-foreground/70 mb-4 flex h-12 w-12 items-center justify-center rounded-full"
+              style={{ boxShadow: "0 0 24px oklch(from var(--color-brand) l c h / 0.25)" }}
+            >
+              {isArchivedView ? (
+                <Archive className="h-5 w-5" />
+              ) : (
+                <MessageSquare className="h-5 w-5" />
+              )}
+            </span>
+            <p className="text-foreground text-sm font-medium">
               {isArchivedView ? "No archived conversations" : t("noConversations")}
             </p>
-            <p className="mt-1 text-xs">
-              {isArchivedView
-                ? "Conversations you archive will appear here."
-                : t("startNewChat")}
+            <p className="text-muted-foreground mt-1 text-xs">
+              {isArchivedView ? "Conversations you archive will appear here." : t("startNewChat")}
             </p>
           </div>
         ) : (
@@ -445,9 +461,7 @@ function ViewTab({
       onClick={onClick}
       className={cn(
         "flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] tracking-wider uppercase transition-colors",
-        active
-          ? "bg-foreground text-background"
-          : "text-foreground/55 hover:text-foreground",
+        active ? "bg-foreground text-background" : "text-foreground/55 hover:text-foreground",
       )}
     >
       {label}
@@ -462,3 +476,4 @@ function ViewTab({
     </button>
   );
 }
+{% endraw %}

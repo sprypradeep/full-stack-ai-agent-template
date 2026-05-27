@@ -10,15 +10,7 @@ import {
   ThumbsUp,
   TrendingUp,
 } from "lucide-react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -94,16 +86,16 @@ export default function AdminRatingsPage() {
       : null;
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6 pb-10">
+    <div className="space-y-6">
       {/* Header */}
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-foreground/55 font-mono text-[11px] tracking-wider uppercase">
-            Response Ratings
+            Response ratings
           </p>
-          <h1 className="font-display text-foreground mt-1 text-3xl font-bold tracking-tight sm:text-4xl">
-            Message quality
-          </h1>
+          <h2 className="font-display text-foreground mt-1 text-xl font-semibold tracking-tight [&_em]:font-accent [&_em]:font-normal [&_em]:italic">
+            Message <em>quality.</em>
+          </h2>
           <p className="text-foreground/65 mt-1 text-sm">
             User feedback on AI responses — last 30 days.
           </p>
@@ -127,7 +119,10 @@ export default function AdminRatingsPage() {
 
       {/* Stat tiles */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatTile label="Total ratings" value={loading ? null : String(summary?.total_ratings ?? 0)} />
+        <StatTile
+          label="Total ratings"
+          value={loading ? null : String(summary?.total_ratings ?? 0)}
+        />
         <StatTile
           label="Likes"
           value={loading ? null : String(summary?.like_count ?? 0)}
@@ -174,31 +169,56 @@ export default function AdminRatingsPage() {
                   fontSize={11}
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontFamily: "var(--font-mono)", fill: "oklch(from var(--color-foreground) l c h / 0.45)" }}
+                  tick={{
+                    fontFamily: "var(--font-mono)",
+                    fill: "oklch(from var(--color-foreground) l c h / 0.45)",
+                  }}
                 />
                 <YAxis
                   stroke="oklch(from var(--color-foreground) l c h / 0.3)"
                   fontSize={11}
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontFamily: "var(--font-mono)", fill: "oklch(from var(--color-foreground) l c h / 0.45)" }}
+                  tick={{
+                    fontFamily: "var(--font-mono)",
+                    fill: "oklch(from var(--color-foreground) l c h / 0.45)",
+                  }}
                   width={28}
                   allowDecimals={false}
                 />
-                <Tooltip content={<RatingsTooltip />} cursor={{ fill: "oklch(from var(--color-foreground) l c h / 0.04)" }} />
-                <Bar dataKey="likes" name="Likes" fill="#22c55e" radius={[3, 3, 0, 0]} maxBarSize={24} />
-                <Bar dataKey="dislikes" name="Dislikes" fill="#ef4444" radius={[3, 3, 0, 0]} maxBarSize={24} />
+                <Tooltip
+                  content={<RatingsTooltip />}
+                  cursor={{ fill: "oklch(from var(--color-foreground) l c h / 0.04)" }}
+                />
+                <Bar
+                  dataKey="likes"
+                  name="Likes"
+                  fill="#22c55e"
+                  radius={[3, 3, 0, 0]}
+                  maxBarSize={24}
+                />
+                <Bar
+                  dataKey="dislikes"
+                  name="Dislikes"
+                  fill="#ef4444"
+                  radius={[3, 3, 0, 0]}
+                  maxBarSize={24}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
           <div className="mt-3 flex items-center gap-5">
             <span className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
-              <span className="text-foreground/55 font-mono text-[10px] tracking-wider uppercase">Likes</span>
+              <span className="text-foreground/55 font-mono text-[10px] tracking-wider uppercase">
+                Likes
+              </span>
             </span>
             <span className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
-              <span className="text-foreground/55 font-mono text-[10px] tracking-wider uppercase">Dislikes</span>
+              <span className="text-foreground/55 font-mono text-[10px] tracking-wider uppercase">
+                Dislikes
+              </span>
             </span>
           </div>
         </section>
@@ -206,7 +226,7 @@ export default function AdminRatingsPage() {
 
       {/* Filters + table */}
       <section className="border-foreground/10 bg-card rounded-2xl border">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-foreground/10 px-5 py-4">
+        <div className="border-foreground/10 flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4">
           <div className="flex items-center gap-3">
             <Select
               value={filter}
@@ -245,7 +265,7 @@ export default function AdminRatingsPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-foreground/[0.07]">
+              <tr className="border-foreground/[0.07] border-b">
                 {["Date", "Rating", "Comment", "Message", "User", ""].map((h, i) => (
                   <th
                     key={i}
@@ -256,71 +276,73 @@ export default function AdminRatingsPage() {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-foreground/[0.05]">
-              {loading
-                ? Array.from({ length: 8 }).map((_, i) => (
-                    <tr key={i}>
-                      <td colSpan={6} className="px-5 py-3">
-                        <div className="bg-foreground/[0.05] h-5 w-full animate-pulse rounded" />
-                      </td>
-                    </tr>
-                  ))
-                : ratings?.items.length === 0
-                  ? (
-                    <tr>
-                      <td colSpan={6} className="py-16 text-center">
-                        <MessageSquare className="text-foreground/20 mx-auto mb-3 h-8 w-8" />
-                        <p className="text-foreground/45 text-sm">No ratings found.</p>
-                        <p className="text-foreground/35 mt-1 text-xs">Try adjusting the filters above.</p>
-                      </td>
-                    </tr>
-                  )
-                  : ratings?.items.map((rating) => (
-                    <tr key={rating.id} className="hover:bg-foreground/[0.02] transition-colors">
-                      <td className="text-foreground/50 whitespace-nowrap px-5 py-3 font-mono text-xs tabular-nums">
-                        {formatDate(rating.created_at)}
-                      </td>
-                      <td className="px-5 py-3">
-                        {rating.rating === 1 ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider uppercase text-green-600 dark:text-green-400">
-                            <ThumbsUp className="h-3 w-3" />
-                            Like
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider uppercase text-red-600 dark:text-red-400">
-                            <ThumbsDown className="h-3 w-3" />
-                            Dislike
-                          </span>
-                        )}
-                      </td>
-                      <td className="text-foreground/65 max-w-[180px] truncate px-5 py-3 text-xs">
-                        {rating.comment || <span className="text-foreground/25">—</span>}
-                      </td>
-                      <td className="text-foreground/50 max-w-[260px] truncate px-5 py-3 text-xs">
-                        {rating.message_content || "—"}
-                      </td>
-                      <td className="text-foreground/65 whitespace-nowrap px-5 py-3 text-xs">
-                        {rating.user_name || rating.user_email || "—"}
-                      </td>
-                      <td className="px-5 py-3">
-                        {rating.conversation_id && (
-                          <Link
-                            href={`/chat?id=${rating.conversation_id}`}
-                            className="text-foreground/40 hover:text-foreground inline-flex items-center gap-1 font-mono text-[11px] tracking-wider uppercase transition-colors"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            View
-                          </Link>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+            <tbody className="divide-foreground/[0.05] divide-y">
+              {loading ? (
+                Array.from({ length: 8 }).map((_, i) => (
+                  <tr key={i}>
+                    <td colSpan={6} className="px-5 py-3">
+                      <div className="bg-foreground/[0.05] h-5 w-full animate-pulse rounded" />
+                    </td>
+                  </tr>
+                ))
+              ) : ratings?.items.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-16 text-center">
+                    <MessageSquare className="text-foreground/20 mx-auto mb-3 h-8 w-8" />
+                    <p className="text-foreground/45 text-sm">No ratings found.</p>
+                    <p className="text-foreground/35 mt-1 text-xs">
+                      Try adjusting the filters above.
+                    </p>
+                  </td>
+                </tr>
+              ) : (
+                ratings?.items.map((rating) => (
+                  <tr key={rating.id} className="hover:bg-foreground/[0.02] transition-colors">
+                    <td className="text-foreground/50 px-5 py-3 font-mono text-xs whitespace-nowrap tabular-nums">
+                      {formatDate(rating.created_at)}
+                    </td>
+                    <td className="px-5 py-3">
+                      {rating.rating === 1 ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider text-green-600 uppercase dark:text-green-400">
+                          <ThumbsUp className="h-3 w-3" />
+                          Like
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider text-red-600 uppercase dark:text-red-400">
+                          <ThumbsDown className="h-3 w-3" />
+                          Dislike
+                        </span>
+                      )}
+                    </td>
+                    <td className="text-foreground/65 max-w-[180px] truncate px-5 py-3 text-xs">
+                      {rating.comment || <span className="text-foreground/25">—</span>}
+                    </td>
+                    <td className="text-foreground/50 max-w-[260px] truncate px-5 py-3 text-xs">
+                      {rating.message_content || "—"}
+                    </td>
+                    <td className="text-foreground/65 px-5 py-3 text-xs whitespace-nowrap">
+                      {rating.user_name || rating.user_email || "—"}
+                    </td>
+                    <td className="px-5 py-3">
+                      {rating.conversation_id && (
+                        <Link
+                          href={`/chat?id=${rating.conversation_id}`}
+                          className="text-foreground/40 hover:text-foreground inline-flex items-center gap-1 font-mono text-[11px] tracking-wider uppercase transition-colors"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          View
+                        </Link>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-foreground/10 px-5 py-3">
+          <div className="border-foreground/10 flex items-center justify-between border-t px-5 py-3">
             <span className="text-foreground/40 font-mono text-[11px] tracking-wider uppercase">
               Page {page + 1} of {totalPages} · {ratings?.total.toLocaleString()} total
             </span>
@@ -372,7 +394,7 @@ function StatTile({
           <>
             <span
               className={cn(
-                "font-display text-3xl font-bold tabular-nums tracking-tight",
+                "font-display text-3xl font-bold tracking-tight tabular-nums",
                 accent === "green" && "text-green-600 dark:text-green-400",
                 accent === "red" && "text-red-600 dark:text-red-400",
                 !accent && "text-foreground",

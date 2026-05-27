@@ -89,7 +89,7 @@
   /* Typography */
   --font-display: var(--font-display), "Bricolage Grotesque", system-ui, sans-serif;
   --font-body: var(--font-body), "Inter", system-ui, sans-serif;
-  --font-accent: var(--font-accent), "Instrument Serif", Georgia, serif;
+  --font-accent: var(--font-display), "Bricolage Grotesque", system-ui, sans-serif;
   --font-mono: var(--font-mono), "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
   /* Motion */

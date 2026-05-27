@@ -1,7 +1,8 @@
-"use client";
+{% raw %}"use client";
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, Mail } from "lucide-react";
 
 import { Button, Input, Label } from "@/components/ui";
@@ -11,6 +12,7 @@ import { ROUTES } from "@/lib/constants";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function ForgotPasswordForm() {
+  const t = useTranslations("auth");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -41,15 +43,21 @@ export function ForgotPasswordForm() {
 
   if (submitted) {
     return (
-      <div className="space-y-6 text-center">
-        <div className="bg-brand/15 mx-auto flex h-12 w-12 items-center justify-center rounded-full">
-          <Mail className="text-foreground h-5 w-5" />
+      <div className="space-y-7 text-center">
+        <div
+          className="bg-brand/15 mx-auto flex h-14 w-14 items-center justify-center rounded-full"
+          style={{ boxShadow: "0 0 32px oklch(from var(--color-brand) l c h / 0.35)" }}
+        >
+          <Mail className="text-foreground h-6 w-6" />
         </div>
         <div className="space-y-2">
-          <h1 className="text-display-md text-foreground">Check your email</h1>
+          <span className="eyebrow text-foreground/55">Check your inbox</span>
+          <h1 className="text-display-md text-foreground [&_em]:font-accent [&_em]:font-normal [&_em]:italic">
+            Link sent. <em>On its way.</em>
+          </h1>
           <p className="text-foreground/70 text-sm">
             If an account exists for <span className="text-foreground font-medium">{email}</span>,
-            we&apos;ve sent a password reset link. The link expires in 1 hour.
+            you&apos;ll get a reset link in a moment. It expires in 1 hour.
           </p>
         </div>
         <Link
@@ -64,30 +72,35 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-8">
       <div className="space-y-2">
-        <span className="eyebrow text-foreground/55">Reset password</span>
-        <h1 className="text-display-md text-foreground">Forgot your password?</h1>
+        <span className="eyebrow text-foreground/55">Forgot password?</span>
+        <h1 className="text-display-md text-foreground [&_em]:font-accent [&_em]:font-normal [&_em]:italic">
+          Happens to the <em>best of us.</em>
+        </h1>
         <p className="text-foreground/65 text-sm">
-          Enter the email associated with your account and we&apos;ll send you a link to reset it.
+          Drop your email below — we&apos;ll send you a one-time link to set a new password.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-1.5">
-          <Label htmlFor="email" className="text-foreground/80 text-xs font-medium uppercase tracking-wider">
-            Email
+          <Label
+            htmlFor="email"
+            className="text-foreground/80 text-xs font-medium tracking-wider uppercase"
+          >
+            {t("email")}
           </Label>
           <Input
             id="email"
             type="email"
-            placeholder="you@example.com"
+            placeholder={t("emailPlaceholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             disabled={isLoading}
             autoComplete="email"
-            className="h-11 rounded-xl"
+            className="h-12 rounded-xl"
           />
         </div>
 
@@ -100,7 +113,7 @@ export function ForgotPasswordForm() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="h-11 w-full rounded-full bg-foreground text-background hover:bg-foreground/90"
+          className="bg-foreground text-background hover:bg-foreground/90 h-12 w-full rounded-full text-base font-medium"
         >
           {isLoading ? (
             "Sending…"
@@ -123,3 +136,4 @@ export function ForgotPasswordForm() {
     </div>
   );
 }
+{% endraw %}
